@@ -18,7 +18,12 @@
  */
 import React from 'react';
 import { legacyValidateInteger, legacyValidateNumber, t } from '@superset-ui/core';
-import { ControlPanelConfig, sections } from '@superset-ui/chart-controls';
+import {
+  ControlPanelConfig,
+  D3_TIME_FORMAT_DOCS,
+  sections,
+  sharedControls,
+} from '@superset-ui/chart-controls';
 
 import {
   DEFAULT_FORM_DATA,
@@ -51,12 +56,14 @@ const {
   rowLimit,
   seriesType,
   stack,
+  tooltipTimeFormat,
   truncateYAxis,
   yAxisBounds,
   zoomable,
   xAxisLabelRotation,
+  xAxisShowMinLabel,
+  xAxisShowMaxLabel,
 } = DEFAULT_FORM_DATA;
-
 const config: ControlPanelConfig = {
   controlPanelSections: [
     sections.legacyTimeseriesTime,
@@ -314,14 +321,25 @@ const config: ControlPanelConfig = {
         [legendTypeControl, legendOrientationControl],
         [legendMarginControl, noopControl],
         [<h1 className="section-header">{t('X Axis')}</h1>],
-        ['x_axis_time_format'],
+        [
+          {
+            name: 'x_axis_time_format',
+            config: {
+              ...sharedControls.x_axis_time_format,
+              default: 'smart_date',
+              description: `${D3_TIME_FORMAT_DOCS}. ${t(
+                'When using other than adaptive formatting, labels may overlap.',
+              )}`,
+            },
+          },
+        ],
         [
           {
             name: 'xAxisShowMinLabel',
             config: {
               type: 'CheckboxControl',
               label: t('Show Min Label'),
-              default: true,
+              default: xAxisShowMinLabel,
               renderTrigger: true,
               description: t('Show Min Label'),
             },
@@ -333,7 +351,7 @@ const config: ControlPanelConfig = {
             config: {
               type: 'CheckboxControl',
               label: t('Show Max Label'),
-              default: true,
+              default: xAxisShowMaxLabel,
               renderTrigger: true,
               description: t('Show Max Label'),
             },
@@ -371,6 +389,17 @@ const config: ControlPanelConfig = {
             },
           },
         ],
+        [
+          {
+            name: 'tooltipTimeFormat',
+            config: {
+              ...sharedControls.x_axis_time_format,
+              label: t('Tooltip time format'),
+              default: tooltipTimeFormat,
+              clearable: false,
+            },
+          },
+        ],
         // eslint-disable-next-line react/jsx-key
         [<h1 className="section-header">{t('Y Axis')}</h1>],
         ['y_axis_format'],
@@ -393,6 +422,18 @@ const config: ControlPanelConfig = {
               renderTrigger: true,
               default: minorSplitLine,
               description: t('Draw split lines for minor y-axis ticks'),
+            },
+          },
+        ],
+        [
+          {
+            name: 'yAxisTitle',
+            config: {
+              type: 'TextControl',
+              label: t('Primary y-axis title'),
+              renderTrigger: true,
+              default: '',
+              description: t('Title for y-axis'),
             },
           },
         ],

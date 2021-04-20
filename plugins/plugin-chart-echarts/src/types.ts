@@ -28,6 +28,8 @@ export interface EchartsProps {
   height: number;
   width: number;
   echartOptions: EChartsOption;
+  eventHandlers?: EventHandlers;
+  selectedValues?: Record<number, string>;
 }
 
 export enum ForecastSeriesEnum {
@@ -75,3 +77,21 @@ export const DEFAULT_LEGEND_FORM_DATA: EchartsLegendFormData = {
   legendType: LegendType.Scroll,
   showLegend: false,
 };
+
+export type EventHandlers = Record<string, { (props: any): void }>;
+
+export enum LabelPositionEnum {
+  Top = 'top',
+  Left = 'left',
+  Right = 'right',
+  Bottom = 'bottom',
+  Inside = 'inside',
+  InsideLeft = 'insideLeft',
+  InsideRight = 'insideRight',
+  InsideTop = 'insideTop',
+  InsideBottom = 'insideBottom',
+  InsideTopLeft = 'insideTopLeft',
+  InsideBottomLeft = 'insideBottomLeft',
+  InsideTopRight = 'insideTopRight',
+  InsideBottomRight = 'insideBottomRight',
+}

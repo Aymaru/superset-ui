@@ -19,8 +19,10 @@ import netherlands from 'file-loader!./countries/netherlands.geojson';
 import portugal from 'file-loader!./countries/portugal.geojson';
 import russia from 'file-loader!./countries/russia.geojson';
 import singapore from 'file-loader!./countries/singapore.geojson';
+import slovenia from 'file-loader!./countries/slovenia.geojson';
 import spain from 'file-loader!./countries/spain.geojson';
 import switzerland from 'file-loader!./countries/switzerland.geojson';
+import syria from 'file-loader!./countries/syria.geojson';
 import thailand from 'file-loader!./countries/thailand.geojson';
 import timorleste from 'file-loader!./countries/timorleste.geojson';
 import uk from 'file-loader!./countries/uk.geojson';
@@ -29,7 +31,7 @@ import uruguay from 'file-loader!./countries/uruguay.geojson';
 import usa from 'file-loader!./countries/usa.geojson';
 import zambia from 'file-loader!./countries/zambia.geojson';
 
-const countries = {
+export const countries = {
   belgium,
   brazil,
   bulgaria,
@@ -50,8 +52,10 @@ const countries = {
   portugal,
   russia,
   singapore,
+  slovenia,
   spain,
   switzerland,
+  syria,
   thailand,
   timorleste,
   uk,
@@ -60,5 +64,12 @@ const countries = {
   usa,
   zambia,
 };
+
+export const countryOptions = Object.keys(countries).map(x => {
+  if (x === 'uk' || x === 'usa') {
+    return [x, x.toUpperCase()];
+  }
+  return [x, x[0].toUpperCase() + x.slice(1)];
+});
 
 export default countries;
