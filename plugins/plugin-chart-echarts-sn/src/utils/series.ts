@@ -24,13 +24,12 @@ import {
   TimeFormatter,
   TimeseriesDataRecord,
 } from '@superset-ui/core';
-import { NULL_STRING } from '../constants';
+import { LegendComponentOption, SeriesOption } from 'echarts';
+import { NULL_STRING, TIMESERIES_CONSTANTS } from '../constants';
 import { LegendOrientation, LegendType } from '../types';
 import { defaultLegendPadding } from '../defaults';
 
-export function extractTimeseriesSeries(
-  data: TimeseriesDataRecord[],
-): echarts.EChartOption.Series[] {
+export function extractTimeseriesSeries(data: TimeseriesDataRecord[]): SeriesOption[] {
   if (data.length === 0) return [];
   const rows = data.map(datum => ({
     ...datum,
@@ -42,9 +41,10 @@ export function extractTimeseriesSeries(
     .map(key => ({
       id: key,
       name: key,
-      // @ts-ignore
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-      data: rows.map(datum => [datum.__timestamp, datum[key]]),
+      data: rows.map((datum: { [p: string]: DataRecordValue; __timestamp: Date | null }) => [
+        datum.__timestamp,
+        datum[key],
+      ]),
     }));
 }
 
@@ -73,22 +73,6 @@ export function formatSeriesName(
   return name;
 }
 
-export function extractGroupbyLabel({
-  datum = {},
-  groupby,
-  numberFormatter,
-  timeFormatter,
-}: {
-  datum?: DataRecord;
-  groupby?: string[] | null;
-  numberFormatter?: NumberFormatter;
-  timeFormatter?: TimeFormatter;
-}): string {
-  return (groupby || [])
-    .map(val => formatSeriesName(datum[val], { numberFormatter, timeFormatter }))
-    .join(', ');
-}
-
 export function extractBreakdownLabel({
   datum = {},
   columns,
@@ -105,12 +89,29 @@ export function extractBreakdownLabel({
     .join(', ');
 }
 
+export function extractGroupbyLabel({
+  datum = {},
+  groupby,
+  numberFormatter,
+  timeFormatter,
+}: {
+  datum?: DataRecord;
+  groupby?: string[] | null;
+  numberFormatter?: NumberFormatter;
+  timeFormatter?: TimeFormatter;
+}): string {
+  return (groupby || [])
+    .map(val => formatSeriesName(datum[val], { numberFormatter, timeFormatter }))
+    .join(', ');
+}
+
 export function getLegendProps(
   type: LegendType,
   orientation: LegendOrientation,
   show: boolean,
-): echarts.EChartOption.Legend {
-  const legend: echarts.EChartOption.Legend = {
+  zoomable = false,
+): LegendComponentOption | LegendComponentOption[] {
+  const legend: LegendComponentOption | LegendComponentOption[] = {
     orient: [LegendOrientation.Top, LegendOrientation.Bottom].includes(orientation)
       ? 'horizontal'
       : 'vertical',
@@ -123,6 +124,7 @@ export function getLegendProps(
       break;
     case LegendOrientation.Right:
       legend.right = 0;
+      legend.top = zoomable ? TIMESERIES_CONSTANTS.legendRightTopOffset : 0;
       break;
     case LegendOrientation.Bottom:
       legend.bottom = 0;
@@ -130,6 +132,7 @@ export function getLegendProps(
     case LegendOrientation.Top:
     default:
       legend.top = 0;
+      legend.right = zoomable ? TIMESERIES_CONSTANTS.legendTopRightOffset : 0;
       break;
   }
   return legend;

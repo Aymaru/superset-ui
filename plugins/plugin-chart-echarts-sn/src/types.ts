@@ -16,6 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+import { NumberFormatter } from '@superset-ui/core';
+import { EChartsOption } from 'echarts';
+import { TooltipMarker } from 'echarts/types/src/util/format';
+
 export type EchartsStylesProps = {
   height: number;
   width: number;
@@ -24,7 +29,7 @@ export type EchartsStylesProps = {
 export interface EchartsProps {
   height: number;
   width: number;
-  echartOptions: echarts.EChartOption;
+  echartOptions: EChartsOption;
 }
 
 export enum ForecastSeriesEnum {
@@ -52,7 +57,7 @@ export enum LegendType {
 }
 
 export type ProphetValue = {
-  marker: string;
+  marker: TooltipMarker;
   observation?: number;
   forecastTrend?: number;
   forecastLower?: number;
@@ -71,4 +76,14 @@ export const DEFAULT_LEGEND_FORM_DATA: EchartsLegendFormData = {
   legendOrientation: LegendOrientation.Top,
   legendType: LegendType.Scroll,
   showLegend: false,
+};
+
+export type AxisType = 'value' | 'category' | 'time' | 'log' | undefined;
+
+export type AxisValues = {
+  type: AxisType;
+  axisLabel: {
+    show: boolean;
+    formatter: undefined | NumberFormatter;
+  };
 };

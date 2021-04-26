@@ -19,11 +19,9 @@
 import { buildQueryContext, QueryFormData } from '@superset-ui/core';
 
 export default function buildQuery(formData: QueryFormData) {
-  // const { /*metric,*/columns, groupby } = formData;
+  const { /*metric,/*/ columns, groupby } = formData;
   return buildQueryContext(formData, baseQueryObject => {
-    const { columns, groupby } = baseQueryObject;
-    const cols: string[] | undefined = groupby?.concat(columns);
-    // const cols: string[] | undefined = groupby?.concat(columns)
+    const cols: string[] = [...columns!, ...groupby!];
     return [
       {
         ...baseQueryObject,

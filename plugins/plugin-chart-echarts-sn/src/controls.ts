@@ -89,8 +89,8 @@ export const barOrientation = {
     clearable: false,
     freeForm: true,
     label: t('Orientation'),
-    choices: formatSelectOptions(['Horizontal', 'Vertical']),
-    default: 'Vertical',
+    choices: formatSelectOptions([t('Horizontal'), t('Vertical')]),
+    default: t('Vertical'),
     renderTrigger: true,
     description: t('Change the bar chart orientation'),
   },
@@ -258,6 +258,26 @@ export const yAxisLabel = {
   config: {
     type: 'TextControl',
     label: t('Y Axis Label'),
+    renderTrigger: true,
+    default: '',
+  },
+};
+
+export const CategoryAxisLabel = {
+  name: 'category_axis_label',
+  config: {
+    type: 'TextControl',
+    label: t('Category Axis Label'),
+    renderTrigger: true,
+    default: '',
+  },
+};
+
+export const ValueAxisLabel = {
+  name: 'value_axis_label',
+  config: {
+    type: 'TextControl',
+    label: t('Category Axis Label'),
     renderTrigger: true,
     default: '',
   },

@@ -16,11 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import * as echarts from 'echarts';
+// import * as echarts from 'echarts';
 
-import { BarSeriesOption } from 'echarts/charts';
+import { EChartsOption, BarSeriesOption } from 'echarts';
 
-import { DatasetComponentOption } from 'echarts/components';
+// import { BarSeriesOption } from 'echarts/charts';
+
+// import { DatasetComponentOption } from 'echarts/components';
 
 import {
   CategoricalColorNamespace,
@@ -28,11 +30,17 @@ import {
   DataRecord,
   getMetricLabel,
   // getNumberFormatter,
-  // NumberFormats,
+  //NumberFormats,
   // NumberFormatter,
 } from '@superset-ui/core';
+import {
+  getNumberFormatterRegistry,
+  /* formatNumber,*/ NumberFormatter,
+  getNumberFormatter,
+  createD3NumberFormatter,
+} from '@superset-ui/core';
 import { DEFAULT_FORM_DATA as DEFAULT_BAR_FORM_DATA, EchartsBarFormData } from './types';
-import { DEFAULT_LEGEND_FORM_DATA, EchartsProps } from '../types';
+import { DEFAULT_LEGEND_FORM_DATA, EchartsProps, AxisValues } from '../types';
 import {
   extractGroupbyLabel,
   extractBreakdownLabel,
@@ -41,37 +49,33 @@ import {
 } from '../utils/series';
 import { defaultGrid, defaultTooltip } from '../defaults';
 
-import { getXAxis, getYAxis, getEncode, getDatasetIndex, addTransformDataset } from './series';
+import {
+  /*getXAxis, getYAxis,/getAxis, */ getEncode,
+  getDatasetIndex,
+  addTransformDataset,
+} from './series';
+import { DatasetOption } from 'echarts/types/src/component/dataset/install';
+import { CallbackDataParams } from 'echarts/types/src/util/types';
 
-// const percentFormatter = getNumberFormatter(NumberFormats.PERCENT_2_POINT);
+//const percentFormatter = getNumberFormatter(NumberFormats.PERCENT_2_POINT);
 
-// export function formatPieLabel({
-//   params,
-//   numberFormatter,
-// }: {
-//   params: echarts.EChartOption.Tooltip.Format;
-//   numberFormatter: NumberFormatter;
-// }): string {
-//   const { name = '', value, percent } = params;
-//   const formattedValue = numberFormatter(value as number);
-//   const formattedPercent = percentFormatter((percent as number) / 100);
-//   switch (labelType) {
-//     case EchartsBarLabelType.Key:
-//       return name;
-//     case EchartsBarLabelType.Value:
-//       return formattedValue;
-//     case EchartsBarLabelType.Percent:
-//       return formattedPercent;
-//     case EchartsBarLabelType.KeyValue:
-//       return `${name}: ${formattedValue}`;
-//     case EchartsBarLabelType.KeyValuePercent:
-//       return `${name}: ${formattedValue} (${formattedPercent})`;
-//     case EchartsBarLabelType.KeyPercent:
-//       return `${name}: ${formattedPercent}`;
-//     default:
-//       return name;
-//   }
-// }
+export function formatBarLabel({
+  params,
+  numberFormatter,
+}: {
+  params: any;
+  numberFormatter: NumberFormatter;
+}): string {
+  console.log('Parametros para formatter');
+  console.log(params);
+  const { value } = params;
+  console.log(value);
+  console.log(typeof value);
+  const formattedValue = numberFormatter(value.value as number);
+  //const formattedPercent = percentFormatter((percent as number) / 100);
+
+  return formattedValue;
+}
 
 export function getLegendData(
   breakdowns: string[],
@@ -90,6 +94,20 @@ export function getLegendData(
   };
 }
 
+getNumberFormatterRegistry().registerValue(
+  'CURRENCY_CR',
+
+  createD3NumberFormatter({
+    locale: {
+      decimal: ',',
+      thousands: '.',
+      grouping: [3, 3, 3, 3, 3, 3, 2, 2, 2, 2],
+      currency: ['₡', ''],
+    },
+    formatString: '$,.2f',
+  }),
+);
+
 export default function transformProps(chartProps: ChartProps): EchartsProps {
   const { width, height, formData, queriesData } = chartProps;
   console.log(chartProps);
@@ -102,23 +120,34 @@ export default function transformProps(chartProps: ChartProps): EchartsProps {
     legendMargin,
     legendOrientation,
     metric = '',
-    // numberFormat,
-    // showLabels,
+    yAxisFormat,
+    showLabels,
     showLegend,
     barOrientation,
     barStacked,
     sortBy,
     sortOrder,
     legendType,
+    showBarValue,
   }: EchartsBarFormData = { ...DEFAULT_LEGEND_FORM_DATA, ...DEFAULT_BAR_FORM_DATA, ...formData };
   const metricLabel = getMetricLabel(metric);
 
   const colorFn = CategoricalColorNamespace.getScale(colorScheme as string);
-  // const numberFormatter = getNumberFormatter(numberFormat);
+  console.log('numberFormat');
+  console.log(yAxisFormat);
+  const numberFormatter = getNumberFormatter(yAxisFormat);
+
+  const formatter = (params: CallbackDataParams) => formatBarLabel({ params, numberFormatter });
+
+  const defaultLabel = {
+    formatter,
+    show: showLabels,
+    color: '#000000',
+  };
 
   console.log(columns);
   console.log(data);
-  const transformedData: DatasetComponentOption[] = data.map(datum => {
+  const transformedData = data.map(datum => {
     const name = extractGroupbyLabel({ datum, groupby });
     const breakdown = extractBreakdownLabel({ datum, columns });
     return {
@@ -157,13 +186,17 @@ export default function transformProps(chartProps: ChartProps): EchartsProps {
     }
     dataset_index++;
     return {
-      name: name,
       type: 'bar',
       ...getChartPadding(showLegend, legendOrientation, legendMargin),
       ...getEncode(barOrientation, no_breakdowns ? name : undefined),
       stack: barStacked ? 'total' : undefined,
       itemStyle: {
         color: colorFn(name),
+      },
+      label: {
+        ...defaultLabel,
+        show: showBarValue,
+        position: 'top',
       },
       emphasis: {
         label: {
@@ -173,10 +206,11 @@ export default function transformProps(chartProps: ChartProps): EchartsProps {
         },
       },
       datasetIndex: dataset_index,
+      name: name,
     };
   });
-
-  const datasets: DatasetComponentOption[] = breakdowns.map(br => {
+  // @ts-ignore
+  const datasets = breakdowns.map(br => {
     return {
       ...getDatasetIndex(sortBy, sortOrder),
       transform: {
@@ -185,29 +219,15 @@ export default function transformProps(chartProps: ChartProps): EchartsProps {
       },
     };
   });
-
-  const dataset: DatasetComponentOption[] = [
-    {
-      source: transformedData,
-    },
-    {
-      ...addTransformDataset('sort', 'name', 'desc'),
-    },
-    {
-      ...addTransformDataset('sort', 'name', 'asc'),
-    },
-    {
-      ...addTransformDataset('sort', 'value', 'desc'),
-    },
-    {
-      ...addTransformDataset('sort', 'value', 'asc'),
-    },
-    {
-      ...addTransformDataset('sort', 'breakdown', 'desc'),
-    },
-    {
-      ...addTransformDataset('sort', 'breakdown', 'asc'),
-    },
+  // @ts-ignore
+  const dataset: DatasetOption = [
+    { source: transformedData },
+    { ...addTransformDataset('sort', 'name', 'desc') },
+    { ...addTransformDataset('sort', 'name', 'asc') },
+    { ...addTransformDataset('sort', 'value', 'desc') },
+    { ...addTransformDataset('sort', 'value', 'asc') },
+    { ...addTransformDataset('sort', 'breakdown', 'desc') },
+    { ...addTransformDataset('sort', 'breakdown', 'asc') },
     ...datasets,
   ];
 
@@ -222,7 +242,72 @@ export default function transformProps(chartProps: ChartProps): EchartsProps {
   console.log('transformed data');
   console.log(transformedData);
   console.log(dataset);
+  console.log('testing');
+  console.log('Datasets-transforms');
+  console.log(datasets);
 
+  const isHorizontalBar = barOrientation === 'Horizontal';
+
+  const categoryAxis_values: AxisValues = {
+    type: isHorizontalBar ? 'value' : 'category',
+    axisLabel: {
+      show: true,
+      formatter: isHorizontalBar ? numberFormatter : undefined,
+    },
+  };
+
+  const valueAxis_values: AxisValues = {
+    type: isHorizontalBar ? 'category' : 'value',
+    axisLabel: {
+      show: true,
+      formatter: isHorizontalBar ? undefined : numberFormatter,
+    },
+  };
+  /*
+    if (isXAxis) {
+      if (bar_orientation === 'Horizontal') {
+        return {
+          type: 'value',
+          axisLabel: {
+            show: true,
+            formatter: `{value} colones`
+          }
+        };
+      }
+      return {
+        type: 'category',
+        axisLabel: {
+          show: true,
+          formatter: `{value} colones`
+        }
+      };
+    }
+    if (bar_orientation === 'Horizontal') {
+      return {
+        type: 'category',
+        axisLabel: {
+          show: true,
+          formatter: `{value} colones`
+        }
+      };
+    }
+    return {
+      type: 'value',
+      axisLabel: {
+        show: true,
+        formatter: `{value} colones`
+      }
+    };
+  }*/
+  // const formatter = getNumberFormatter('₡,.2f');
+  // console.log(formatter(1000));
+
+  // console.log(formatNumber('₡.2f', 1000.444444));
+
+  // console.log(formatNumber('my_format', 1000));
+
+  // const formatter2 = getNumberFormatter('CURRENCY_CR');
+  // console.log(formatter2(1848.0546));
   // const formatter = (params: { name: string; value: number; percent: number }) =>
   //   formatPieLabel({ params, numberFormatter, labelType });
 
@@ -260,21 +345,40 @@ export default function transformProps(chartProps: ChartProps): EchartsProps {
   //     },
   //   ],
 
-  const echartOptions: echarts.EChartOption<echarts.EChartOption.SeriesBar> = {
-    ...dataset,
+  const echartOptions: EChartsOption = {
+    dataset: dataset,
     grid: {
       ...defaultGrid,
     },
     legend: {
       ...getLegendProps(legendType, legendOrientation, showLegend),
       ...getLegendData(breakdowns, metricLabel),
+      // data: breakdowns
     },
     tooltip: {
       ...defaultTooltip,
+      trigger: 'item',
     },
-    ...getXAxis(barOrientation),
-    ...getYAxis(barOrientation),
-    ...series,
+    xAxis: {
+      ...categoryAxis_values,
+      // ...getAxis(barOrientation),
+      // axisLabel: {
+      //   show: true,
+      //   formatter: `{value} colones`
+      // },
+    },
+    yAxis: {
+      ...valueAxis_values,
+      // ...getAxis(barOrientation,false),
+      // axisLabel: {
+      //   show: true,
+      //   formatter: numberFormatter
+      // },
+    },
+    // ...getAxis(barOrientation),
+    // ...getXAxis(barOrientation),
+    // ...getYAxis(barOrientation),
+    series: [...series],
   };
 
   return {

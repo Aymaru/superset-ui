@@ -19,6 +19,8 @@
 import React from 'react';
 import { t, validateNonEmpty } from '@superset-ui/core';
 import { ControlPanelConfig, /*D3_FORMAT_OPTIONS,*/ sections } from '@superset-ui/chart-controls';
+import { D3_VALUE_FORMAT_OPTIONS } from '../constants';
+
 // import { DEFAULT_FORM_DATA } from './types';
 import {
   showLegendControl,
@@ -26,18 +28,18 @@ import {
   legendOrientationControl,
   legendMarginControl,
   showControls,
-  xAxisLabel,
   bottomMargin,
   xTicksLayout,
   showBarValue,
   barStacked,
   reduceXTicks,
-  yAxisLabel,
   yAxisShowMinmax,
   yAxisBounds,
   barOrientation,
   sortBy,
   sortOrder,
+  ValueAxisLabel,
+  CategoryAxisLabel,
 } from '../controls';
 
 // const {
@@ -91,20 +93,20 @@ const config: ControlPanelConfig = {
       ],
     },
     {
-      label: t('Y Axis'),
+      label: t('Value Axis'),
       expanded: true,
       controlSetRows: [
         ['y_axis_format'],
-        [yAxisLabel],
+        [ValueAxisLabel],
         [showControls, null],
         [yAxisShowMinmax],
         [yAxisBounds],
       ],
     },
     {
-      label: t('X Axis'),
+      label: t('Category Axis'),
       expanded: true,
-      controlSetRows: [[xAxisLabel], [bottomMargin], [xTicksLayout], [reduceXTicks]],
+      controlSetRows: [[CategoryAxisLabel], [bottomMargin], [xTicksLayout], [reduceXTicks]],
     },
   ],
   controlOverrides: {
@@ -118,6 +120,11 @@ const config: ControlPanelConfig = {
     },
     row_limit: {
       default: 100,
+    },
+    y_axis_format: {
+      label: t('Value Axis Format'),
+      choices: D3_VALUE_FORMAT_OPTIONS,
+      default: '',
     },
   },
 };

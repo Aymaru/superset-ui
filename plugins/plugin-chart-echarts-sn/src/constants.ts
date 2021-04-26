@@ -16,5 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+import { D3_FORMAT_OPTIONS } from '@superset-ui/chart-controls';
+
 // eslint-disable-next-line import/prefer-default-export
 export const NULL_STRING = '<NULL>';
+
+export const TIMESERIES_CONSTANTS = {
+  gridOffsetRight: 40,
+  gridOffsetLeft: 20,
+  gridOffsetTop: 20,
+  gridOffsetBottom: 20,
+  gridOffsetBottomZoomable: 80,
+  legendRightTopOffset: 30,
+  legendTopRightOffset: 55,
+  zoomBottom: 30,
+  toolboxTop: 0,
+  toolboxRight: 5,
+  dataZoomStart: 0,
+  dataZoomEnd: 100,
+};
+
+export const D3_VALUE_FORMAT_OPTIONS = [
+  ['CURRENCY_CR', '₡.,2f (12345.432 => $12,345.43)'],
+  ...D3_FORMAT_OPTIONS,
+];

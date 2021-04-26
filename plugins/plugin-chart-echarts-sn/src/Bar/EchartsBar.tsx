@@ -21,5 +21,8 @@ import { EchartsProps } from '../types';
 import EchartSN from '../components/Echart';
 
 export default function EchartsBar({ height, width, echartOptions }: EchartsProps) {
+  console.log('echartsOptions');
+  console.log(echartOptions);
+  console.log(height, width);
   return <EchartSN height={height} width={width} echartOptions={echartOptions} />;
 }

@@ -34,11 +34,12 @@ export type EchartsBarFormData = EchartsLegendFormData & {
   metric?: string;
   outerRadius: number;
   showLabels: boolean;
-  numberFormat: string;
+  yAxisFormat: string;
   barOrientation: string;
   sortBy: string;
   sortOrder: boolean;
   barStacked: boolean;
+  showBarValue: boolean;
 };
 
 export const DEFAULT_FORM_DATA: EchartsBarFormData = {
@@ -49,7 +50,7 @@ export const DEFAULT_FORM_DATA: EchartsBarFormData = {
   labelLine: false,
   legendOrientation: LegendOrientation.Top,
   legendType: LegendType.Scroll,
-  numberFormat: 'SMART_NUMBER',
+  yAxisFormat: 'SMART_NUMBER',
   outerRadius: 70,
   showLabels: true,
   labelsOutside: true,
@@ -57,6 +58,7 @@ export const DEFAULT_FORM_DATA: EchartsBarFormData = {
   sortBy: 'none',
   sortOrder: false,
   barStacked: false,
+  showBarValue: false,
 };
 
 export const sortOptions = [

@@ -17,17 +17,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+// import { Axis } from 'echarts'
 
 import { sortOptions } from './types';
+import { AxisType } from '../types';
 
 // export function getAxis(
 //   bar_orientation: string,
 // ): {
-//   xAxis: { type: Axis };
-//   yAxis: { type: Axis };
+//   xAxis: Axis;
+//   yAxis: Axis;
 // } {
-//   var xAxisType = 'category';
-//   var yAxisType = 'value';
+//   var xAxisType: "value" | "category" | "time" | "log" = 'category';
+//   var yAxisType: "value" | "category" | "time" | "log" = 'value';
 
 //   if (bar_orientation === 'Horizontal') {
 //     xAxisType = 'value';
@@ -39,27 +41,64 @@ import { sortOptions } from './types';
 //   };
 // }
 
-export function getXAxis(bar_orientation: string): echarts.EChartOption.XAxis {
-  if (bar_orientation === 'Horizontal') {
+export function getAxis(
+  bar_orientation: string,
+  isXAxis: boolean = true,
+): {
+  type: AxisType;
+  axisLabel: {
+    show: boolean;
+    formatter: string;
+  };
+} {
+  if (isXAxis) {
+    if (bar_orientation === 'Horizontal') {
+      return {
+        type: 'value',
+        axisLabel: {
+          show: true,
+          formatter: `{value} colones`,
+        },
+      };
+    }
     return {
-      type: 'value',
+      type: 'category',
+      axisLabel: {
+        show: true,
+        formatter: `{value} colones`,
+      },
     };
   }
-  return {
-    type: 'category',
-  };
-}
-
-export function getYAxis(bar_orientation: string): echarts.EChartOption.YAxis | undefined {
   if (bar_orientation === 'Horizontal') {
     return {
       type: 'category',
+      axisLabel: {
+        show: true,
+        formatter: `{value} colones`,
+      },
     };
   }
   return {
     type: 'value',
+    axisLabel: {
+      show: true,
+      formatter: `{value} colones`,
+    },
   };
 }
+
+// export function getYAxis(bar_orientation: string): {
+//   type: AxisType
+// } {
+//   if (bar_orientation === 'Horizontal') {
+//     return {
+//       type: 'category',
+//     };
+//   }
+//   return {
+//     type: 'value',
+//   };
+// }
 
 export function getEncode(
   bar_orientation: string,

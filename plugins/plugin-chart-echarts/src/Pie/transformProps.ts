@@ -26,7 +26,7 @@ import {
   NumberFormatter,
 } from '@superset-ui/core';
 import { CallbackDataParams } from 'echarts/types/src/util/types';
-import { EChartsOption, PieSeriesOption } from 'echarts';
+import { EChartOption, PieSerieOption } from 'echarts';
 import {
   DEFAULT_FORM_DATA as DEFAULT_PIE_FORM_DATA,
   EchartsPieChartProps,
