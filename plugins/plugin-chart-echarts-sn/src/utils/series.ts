@@ -18,11 +18,15 @@
  * under the License.
  */
 import {
+  ChartDataResponseResult,
+  GenericDataType,
   DataRecord,
   DataRecordValue,
   NumberFormatter,
   TimeFormatter,
   TimeseriesDataRecord,
+  createD3NumberFormatter,
+  getNumberFormatterRegistry,
 } from '@superset-ui/core';
 import { LegendComponentOption, SeriesOption } from 'echarts';
 import { NULL_STRING, TIMESERIES_CONSTANTS } from '../constants';
@@ -165,4 +169,26 @@ export function getChartPadding(
     top: top + (orientation === LegendOrientation.Top ? legendMargin : 0),
     bottom: bottom + (orientation === LegendOrientation.Bottom ? legendMargin : 0),
   };
+}
+
+export const getColtypesMapping = ({
+  coltypes = [],
+  colnames = [],
+}: ChartDataResponseResult): Record<string, GenericDataType> =>
+  colnames.reduce((accumulator, item, index) => ({ ...accumulator, [item]: coltypes[index] }), {});
+
+export function get_cr_currency() {
+  getNumberFormatterRegistry().registerValue(
+    'CURRENCY_CR',
+
+    createD3NumberFormatter({
+      locale: {
+        decimal: ',',
+        thousands: '.',
+        grouping: [3, 3, 3, 3, 3, 3, 2, 2, 2, 2],
+        currency: ['₡', ''],
+      },
+      formatString: '$,.2f',
+    }),
+  );
 }

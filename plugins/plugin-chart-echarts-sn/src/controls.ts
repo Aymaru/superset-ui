@@ -1,8 +1,3 @@
-import { t } from '@superset-ui/core';
-import { DEFAULT_LEGEND_FORM_DATA } from './types';
-
-import { formatSelectOptions } from '@superset-ui/chart-controls';
-
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -21,6 +16,44 @@ import { formatSelectOptions } from '@superset-ui/chart-controls';
  * specific language governing permissions and limitations
  * under the License.
  */
+
+import { t } from '@superset-ui/core';
+import { ReactNode } from 'react';
+import { DEFAULT_LEGEND_FORM_DATA } from './types';
+import { formatSelectOptions } from '@superset-ui/chart-controls';
+
+import { InputNumber } from 'antd';
+
+export const ControlFormItemComponents = { InputNumber };
+
+export type ControlType = keyof typeof ControlFormItemComponents;
+
+export type ControlFormValueValidator<V> = (value: V) => string | false;
+
+export type ControlFormItemSpec<T extends ControlType = ControlType> = {
+  controlType: T;
+  label: ReactNode;
+  description: ReactNode;
+  placeholder?: string;
+  required?: boolean;
+  validators?: ControlFormValueValidator<any>[];
+  width?: number | string;
+  debounceDelay?: number;
+} & (T extends 'InputNumber'
+  ? {
+      min?: number;
+      max?: number;
+      step?: number;
+      value?: number;
+      defaultValue?: number;
+      validators?: ControlFormValueValidator<number>[];
+    }
+  : {});
+
+/**
+
+ */
+
 const { legendMargin, legendOrientation, legendType, showLegend } = DEFAULT_LEGEND_FORM_DATA;
 
 export const noopControl = { name: 'noop', config: { type: '', renderTrigger: true } };
@@ -96,6 +129,20 @@ export const barOrientation = {
   },
 };
 
+export const tooltipDisplay = {
+  name: 'tooltipDisplay',
+  config: {
+    type: 'SelectControl',
+    clearable: false,
+    freeForm: true,
+    label: t('Tooltip'),
+    choices: formatSelectOptions(['item', 'axis']),
+    default: 'item',
+    renderTrigger: true,
+    description: t('Selecciona la accion que muestra el tooltip en el gráfico'),
+  },
+};
+
 export const sortBy = {
   name: 'sortBy',
   config: {
@@ -103,8 +150,8 @@ export const sortBy = {
     clearable: false,
     freeForm: true,
     label: t('Sort by'),
-    choices: formatSelectOptions(['none', 'serie', 'value', 'breakdown']),
-    default: 'none',
+    choices: formatSelectOptions(['name', 'value']),
+    default: 'name',
     renderTrigger: true,
     description: t('Sort data by name or by value'),
   },
@@ -120,20 +167,6 @@ export const sortOrder = {
     description: t('Check to sort asc, else sort desc'),
   },
 };
-
-// export const bottomMargin = {
-//   name: 'bottom_margin',
-//   config: {
-//     type: 'SelectControl',
-//     clearable: false,
-//     freeForm: true,
-//     label: t('Bottom Margin'),
-//     choices: formatSelectOptions(['auto', 50, 75, 100, 125, 150, 200]),
-//     default: 'auto',
-//     renderTrigger: true,
-//     description: t('Bottom margin, in pixels, allowing for more room for axis labels'),
-//   },
-// };
 
 export const yAxisShowMinmax = {
   name: 'y_axis_showminmax',

@@ -36,3 +36,21 @@ export const defaultLegendPadding = {
   [LegendOrientation.Left]: 170,
   [LegendOrientation.Right]: 170,
 };
+
+export const defaultAxisLine = {
+  lineStyle: {
+    color: '#000000',
+    width: 1,
+    opacity: 1,
+  },
+};
+
+export const defaultAxis = {
+  nameLocation: 'center',
+  nameGap: 50,
+  nameItemStyle: {
+    align: 'center',
+    fontStyle: 'normal',
+    fontWeight: 'bold',
+  },
+};

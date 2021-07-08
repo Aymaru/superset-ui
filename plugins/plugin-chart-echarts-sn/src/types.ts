@@ -82,8 +82,34 @@ export type AxisType = 'value' | 'category' | 'time' | 'log' | undefined;
 
 export type AxisValues = {
   type: AxisType;
+  name?: string;
+  min?: number;
+  max?: number;
+  nameGap?: number;
   axisLabel: {
     show: boolean;
-    formatter: undefined | NumberFormatter;
+    formatter?: NumberFormatter;
+    rotate?: number;
+    showMinLabel?: boolean;
+    showMaxLabel?: boolean;
   };
+  axisLine: {};
+  splitLine: {};
+  axisTick: {};
 };
+
+export enum LabelPositionEnum {
+  Top = 'top',
+  Left = 'left',
+  Right = 'right',
+  Bottom = 'bottom',
+  Inside = 'inside',
+  InsideLeft = 'insideLeft',
+  InsideRight = 'insideRight',
+  InsideTop = 'insideTop',
+  InsideBottom = 'insideBottom',
+  InsideTopLeft = 'insideTopLeft',
+  InsideBottomLeft = 'insideBottomLeft',
+  InsideTopRight = 'insideTopRight',
+  InsideBottomRight = 'insideBottomRight',
+}

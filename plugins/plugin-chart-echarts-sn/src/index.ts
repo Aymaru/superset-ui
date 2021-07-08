@@ -17,6 +17,9 @@
  * under the License.
  */
 export { default as EchartsBarChartPlugin } from './Bar';
+export { default as EchartsRadarChartPlugin } from './Radar';
+export { default as EchartsGaugeChartPlugin } from './Gauge';
+
 /**
  * Note: this file exports the default export from EchartsTimeseries.tsx.
  * If you want to export multiple visualization modules, you will need to
