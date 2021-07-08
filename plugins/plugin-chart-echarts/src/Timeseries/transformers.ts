@@ -44,6 +44,8 @@ import {
   MarkArea1DDataItemOption,
   MarkArea2DDataItemOption,
 } from 'echarts/types/src/component/marker/MarkAreaModel';
+import { MarkLine1DDataItemOption } from 'echarts/types/src/component/marker/MarkLineModel';
+
 import { extractForecastSeriesContext } from '../utils/prophet';
 import { ForecastSeriesEnum, LegendOrientation } from '../types';
 import { EchartsTimeseriesSeriesType } from './types';
@@ -68,7 +70,6 @@ export function transformSeries(
     opacity?: number;
     seriesType?: EchartsTimeseriesSeriesType;
     stack?: boolean;
-    richTooltip?: boolean;
     yAxisIndex?: number;
   },
 ): SeriesOption | undefined {
@@ -81,7 +82,6 @@ export function transformSeries(
     opacity,
     seriesType,
     stack,
-    richTooltip,
     yAxisIndex = 0,
   } = opts;
   const forecastSeries = extractForecastSeriesContext(name || '');
@@ -134,10 +134,7 @@ export function transformSeries(
     },
     showSymbol:
       !isConfidenceBand &&
-      (plotType === 'scatter' ||
-        (forecastEnabled && isObservation) ||
-        markerEnabled ||
-        !richTooltip), // TODO: forcing markers when richTooltip is enabled will be removed once ECharts supports item based tooltips without markers
+      (plotType === 'scatter' || (forecastEnabled && isObservation) || markerEnabled),
     symbolSize: markerSize,
   };
 }
@@ -234,7 +231,7 @@ export function transformEventAnnotation(
     const { name, color, opacity, style, width } = layer;
     const { descriptions, time, title } = annotation;
     const label = formatAnnotationLabel(name, title, descriptions);
-    const eventData = [
+    const eventData: MarkLine1DDataItemOption[] = [
       {
         name: label,
         xAxis: (time as unknown) as number,
@@ -334,7 +331,7 @@ export function getPadding(
   });
 }
 
-export function getTooltipFormatter(format?: string): TimeFormatter | StringConstructor {
+export function getTooltipTimeFormatter(format?: string): TimeFormatter | StringConstructor {
   if (format === smartDateFormatter.id) {
     return smartDateDetailedFormatter;
   }

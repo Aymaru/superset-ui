@@ -8,11 +8,13 @@ import egypt from 'file-loader!./countries/egypt.geojson';
 import france from 'file-loader!./countries/france.geojson';
 import germany from 'file-loader!./countries/germany.geojson';
 import india from 'file-loader!./countries/india.geojson';
+import indonesia from 'file-loader!./countries/indonesia.geojson';
 import iran from 'file-loader!./countries/iran.geojson';
 import italy from 'file-loader!./countries/italy.geojson';
 import japan from 'file-loader!./countries/japan.geojson';
 import korea from 'file-loader!./countries/korea.geojson';
 import liechtenstein from 'file-loader!./countries/liechtenstein.geojson';
+import malaysia from 'file-loader!./countries/malaysia.geojson';
 import morocco from 'file-loader!./countries/morocco.geojson';
 import myanmar from 'file-loader!./countries/myanmar.geojson';
 import netherlands from 'file-loader!./countries/netherlands.geojson';
@@ -41,11 +43,13 @@ export const countries = {
   france,
   germany,
   india,
+  indonesia,
   iran,
   italy,
   japan,
   korea,
   liechtenstein,
+  malaysia,
   morocco,
   myanmar,
   netherlands,

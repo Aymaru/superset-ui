@@ -16,11 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { QueryFormData, DataRecord, AdhocMetric } from '@superset-ui/core';
+import {
+  QueryFormData,
+  DataRecord,
+  AdhocMetric,
+  SetDataMaskHook,
+  DataRecordValue,
+  JsonObject,
+} from '@superset-ui/core';
 
 export interface PivotTableStylesProps {
   height: number;
   width: number;
+}
+
+export type FilterType = Record<string, DataRecordValue>;
+export type SelectedFiltersType = Record<string, DataRecordValue[]>;
+
+export enum MetricsLayoutEnum {
+  ROWS = 'ROWS',
+  COLUMNS = 'COLUMNS',
 }
 
 interface PivotTableCustomizeProps {
@@ -37,6 +52,11 @@ interface PivotTableCustomizeProps {
   colTotals: boolean;
   rowTotals: boolean;
   valueFormat: string;
+  setDataMask: SetDataMaskHook;
+  emitFilter?: boolean;
+  selectedFilters?: SelectedFiltersType;
+  verboseMap?: JsonObject;
+  metricsLayout?: MetricsLayoutEnum;
 }
 
 export type PivotTableQueryFormData = QueryFormData &

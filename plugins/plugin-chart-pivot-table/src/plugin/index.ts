@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { t, ChartMetadata, ChartPlugin } from '@superset-ui/core';
+import { t, ChartMetadata, ChartPlugin, Behavior } from '@superset-ui/core';
 import buildQuery from './buildQuery';
 import controlPanel from './controlPanel';
 import transformProps from './transformProps';
@@ -36,8 +36,13 @@ export default class PivotTableChartPlugin extends ChartPlugin<PivotTableQueryFo
    */
   constructor() {
     const metadata = new ChartMetadata({
-      description: 'Pivot Table - experimental',
+      behaviors: [Behavior.INTERACTIVE_CHART],
+      category: t('Table'),
+      description: t(
+        'Used to summarize a set of data by grouping together multiple statistics along two axes. Examples: Sales numbers by region and month, tasks by status and assignee, active users by age and location. Not the most visually stunning visualization, but highly informative and versatile.',
+      ),
       name: t('Pivot Table v2'),
+      tags: [t('Additive'), t('Report'), t('Tabular')],
       thumbnail,
     });
 

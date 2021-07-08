@@ -17,9 +17,16 @@
  * under the License.
  */
 import React from 'react';
-import { legacyValidateInteger, legacyValidateNumber, t } from '@superset-ui/core';
+import {
+  FeatureFlag,
+  isFeatureEnabled,
+  legacyValidateInteger,
+  legacyValidateNumber,
+  t,
+} from '@superset-ui/core';
 import {
   ControlPanelConfig,
+  ControlPanelsContainerProps,
   D3_TIME_FORMAT_DOCS,
   sections,
   sharedControls,
@@ -30,18 +37,13 @@ import {
   EchartsTimeseriesContributionType,
   EchartsTimeseriesSeriesType,
 } from './types';
-import {
-  legendMarginControl,
-  legendOrientationControl,
-  legendTypeControl,
-  noopControl,
-  showLegendControl,
-} from '../controls';
+import { legendSection } from '../controls';
 
 const {
   area,
   annotationLayers,
   contributionMode,
+  emitFilter,
   forecastEnabled,
   forecastInterval,
   forecastPeriods,
@@ -61,8 +63,6 @@ const {
   yAxisBounds,
   zoomable,
   xAxisLabelRotation,
-  xAxisShowMinLabel,
-  xAxisShowMaxLabel,
 } = DEFAULT_FORM_DATA;
 const config: ControlPanelConfig = {
   controlPanelSections: [
@@ -90,7 +90,8 @@ const config: ControlPanelConfig = {
           },
         ],
         ['adhoc_filters'],
-        ['limit', 'timeseries_limit_metric'],
+        ['limit'],
+        ['timeseries_limit_metric'],
         [
           {
             name: 'order_desc',
@@ -102,7 +103,7 @@ const config: ControlPanelConfig = {
             },
           },
         ],
-        ['row_limit', null],
+        ['row_limit'],
       ],
     },
     {
@@ -248,7 +249,7 @@ const config: ControlPanelConfig = {
             name: 'stack',
             config: {
               type: 'CheckboxControl',
-              label: t('Stack Lines'),
+              label: t('Stack series'),
               renderTrigger: true,
               default: stack,
               description: t('Stack series on top of each other'),
@@ -266,17 +267,21 @@ const config: ControlPanelConfig = {
               description: t('Draw area under curves. Only applicable for line types.'),
             },
           },
+        ],
+        [
           {
             name: 'opacity',
             config: {
               type: 'SliderControl',
-              label: t('Opacity'),
+              label: t('Area chart opacity'),
               renderTrigger: true,
               min: 0,
               max: 1,
               step: 0.1,
               default: opacity,
               description: t('Opacity of Area Chart. Also applies to confidence band.'),
+              visibility: ({ controls }: ControlPanelsContainerProps) =>
+                Boolean(controls?.area?.value),
             },
           },
         ],
@@ -291,6 +296,8 @@ const config: ControlPanelConfig = {
               description: t('Draw a marker on data points. Only applicable for line types.'),
             },
           },
+        ],
+        [
           {
             name: 'markerSize',
             config: {
@@ -301,6 +308,8 @@ const config: ControlPanelConfig = {
               max: 100,
               default: markerSize,
               description: t('Size of marker. Also applies to forecast observations.'),
+              visibility: ({ controls }: ControlPanelsContainerProps) =>
+                Boolean(controls?.markerEnabled?.value),
             },
           },
         ],
@@ -316,10 +325,21 @@ const config: ControlPanelConfig = {
             },
           },
         ],
-        [<h1 className="section-header">{t('Legend')}</h1>],
-        [showLegendControl],
-        [legendTypeControl, legendOrientationControl],
-        [legendMarginControl, noopControl],
+        isFeatureEnabled(FeatureFlag.DASHBOARD_CROSS_FILTERS)
+          ? [
+              {
+                name: 'emit_filter',
+                config: {
+                  type: 'CheckboxControl',
+                  label: t('Enable emitting filters'),
+                  default: emitFilter,
+                  renderTrigger: true,
+                  description: t('Enable emmiting filters.'),
+                },
+              },
+            ]
+          : [],
+        ...legendSection,
         [<h1 className="section-header">{t('X Axis')}</h1>],
         [
           {
@@ -330,30 +350,6 @@ const config: ControlPanelConfig = {
               description: `${D3_TIME_FORMAT_DOCS}. ${t(
                 'When using other than adaptive formatting, labels may overlap.',
               )}`,
-            },
-          },
-        ],
-        [
-          {
-            name: 'xAxisShowMinLabel',
-            config: {
-              type: 'CheckboxControl',
-              label: t('Show Min Label'),
-              default: xAxisShowMinLabel,
-              renderTrigger: true,
-              description: t('Show Min Label'),
-            },
-          },
-        ],
-        [
-          {
-            name: 'xAxisShowMaxLabel',
-            config: {
-              type: 'CheckboxControl',
-              label: t('Show Max Label'),
-              default: xAxisShowMaxLabel,
-              renderTrigger: true,
-              description: t('Show Max Label'),
             },
           },
         ],
@@ -414,6 +410,8 @@ const config: ControlPanelConfig = {
               description: t('Logarithmic y-axis'),
             },
           },
+        ],
+        [
           {
             name: 'minorSplitLine',
             config: {
@@ -465,6 +463,8 @@ const config: ControlPanelConfig = {
                   "this feature will only expand the axis range. It won't " +
                   "narrow the data's extent.",
               ),
+              visibility: ({ controls }: ControlPanelsContainerProps) =>
+                Boolean(controls?.truncateYAxis?.value),
             },
           },
         ],

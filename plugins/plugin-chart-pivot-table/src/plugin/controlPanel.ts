@@ -16,13 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { t, validateNonEmpty } from '@superset-ui/core';
+import { FeatureFlag, isFeatureEnabled, t, validateNonEmpty } from '@superset-ui/core';
 import {
   ControlPanelConfig,
   formatSelectOptions,
   sections,
   sharedControls,
 } from '@superset-ui/chart-controls';
+import { MetricsLayoutEnum } from '../types';
 
 const config: ControlPanelConfig = {
   controlPanelSections: [
@@ -57,6 +58,22 @@ const config: ControlPanelConfig = {
             config: {
               ...sharedControls.metrics,
               validators: [validateNonEmpty],
+            },
+          },
+        ],
+        [
+          {
+            name: 'metricsLayout',
+            config: {
+              type: 'RadioButtonControl',
+              renderTrigger: true,
+              label: t('Apply metrics on'),
+              default: MetricsLayoutEnum.COLUMNS,
+              options: [
+                [MetricsLayoutEnum.COLUMNS, t('Columns')],
+                [MetricsLayoutEnum.ROWS, t('Rows')],
+              ],
+              description: t('Use metrics as a top level group for columns or for rows'),
             },
           },
         ],
@@ -148,6 +165,9 @@ const config: ControlPanelConfig = {
                 ['Table With Subtotal Heatmap', t('Table Heatmap')],
                 ['Table With Subtotal Col Heatmap', t('Table Col Heatmap')],
                 ['Table With Subtotal Row Heatmap', t('Table Row Heatmap')],
+                ['Table With Subtotal Barchart', t('Table Barchart')],
+                ['Table With Subtotal Col Barchart', t('Table Col Barchart')],
+                ['Table With Subtotal Row Barchart', t('Table Row Barchart')],
               ],
               renderTrigger: true,
               description: t('The type of pivot table visualization'),
@@ -244,6 +264,22 @@ const config: ControlPanelConfig = {
             },
           },
         ],
+        isFeatureEnabled(FeatureFlag.DASHBOARD_CROSS_FILTERS)
+          ? [
+              {
+                name: 'emitFilter',
+                config: {
+                  type: 'CheckboxControl',
+                  label: t('Enable emitting filters'),
+                  renderTrigger: true,
+                  default: false,
+                  description: t(
+                    'Whether to apply filter to dashboards when table cells are clicked',
+                  ),
+                },
+              },
+            ]
+          : [],
       ],
     },
   ],
