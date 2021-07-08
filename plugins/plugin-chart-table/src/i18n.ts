@@ -16,6 +16,19 @@ const en = {
 
 const translations: Partial<Record<Locale, typeof en>> = {
   en,
+  es: {
+    'Query Mode': ['Modo de Consulta'],
+    Aggregate: ['Agregación'],
+    'Raw Records': ['Todos los registros'],
+    'Emit Filter Events': ['Emitir eventos de filtro'],
+    'Show Cell Bars': ['Mostrar celdas'],
+    'page_size.show': ['Mostrar'],
+    'page_size.all': ['Todos'],
+    'page_size.entries': ['Entradas'],
+    'table.previous_page': ['Anterior'],
+    'table.next_page': ['Siguiente'],
+    'search.num_records': ['%s registro', '%s registros...'],
+  },
   fr: {
     'Query Mode': [''],
     Aggregate: [''],
