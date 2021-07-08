@@ -17,29 +17,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-// import { Axis } from 'echarts'
 
 import { sortOptions } from './types';
 import { AxisType } from '../types';
-
-// export function getAxis(
-//   bar_orientation: string,
-// ): {
-//   xAxis: Axis;
-//   yAxis: Axis;
-// } {
-//   var xAxisType: "value" | "category" | "time" | "log" = 'category';
-//   var yAxisType: "value" | "category" | "time" | "log" = 'value';
-
-//   if (bar_orientation === 'Horizontal') {
-//     xAxisType = 'value';
-//     yAxisType = 'category';
-//   }
-//   return {
-//     xAxis: { type: xAxisType },
-//     yAxis: { type: yAxisType },
-//   };
-// }
 
 export function getAxis(
   bar_orientation: string,
@@ -87,34 +67,24 @@ export function getAxis(
   };
 }
 
-// export function getYAxis(bar_orientation: string): {
-//   type: AxisType
-// } {
-//   if (bar_orientation === 'Horizontal') {
-//     return {
-//       type: 'category',
-//     };
-//   }
-//   return {
-//     type: 'value',
-//   };
-// }
-
 export function getEncode(
   bar_orientation: string,
+  metric: string,
   seriesName?: string,
 ): {
   encode: {
     x: string;
     y: string;
     seriesName?: string;
+    itemName?: string;
+    value?: string;
   };
 } {
   var xValue = 'name';
-  var yValue = 'value';
+  var yValue = metric;
 
   if (bar_orientation === 'Horizontal') {
-    xValue = 'value';
+    xValue = metric;
     yValue = 'name';
   }
 
@@ -122,7 +92,9 @@ export function getEncode(
     encode: {
       x: xValue,
       y: yValue,
-      seriesName: seriesName ? seriesName : 'breakdown',
+      seriesName: seriesName,
+      itemName: 'name',
+      value: yValue,
     },
   };
 }
@@ -143,7 +115,6 @@ export function getDatasetIndex(
       });
     }
   });
-
   return {
     fromDatasetIndex: datasetIndexValue,
   };
@@ -175,4 +146,35 @@ export function addTransformDataset(
       },
     ],
   };
+}
+
+export function get_name_gap(
+  max_label_value: number,
+  max_label_category: number,
+  isHorizontalBar: boolean,
+  axis: 'value' | 'category',
+) {
+  //isHorizontalBar ? 50 : 75, value
+  //isHorizontalBar ? 105 : 50, category
+  console.log(
+    `max label value ${max_label_value}\n max label category ${max_label_category}\n axis ${axis}`,
+  );
+  var name_gap = 50;
+  if (axis == 'value') {
+    if (isHorizontalBar) {
+      return name_gap;
+    } else {
+      if (max_label_value <= 6) return name_gap;
+      if (max_label_value <= 11) return name_gap + 25;
+    }
+  } else {
+    if (isHorizontalBar) {
+      if (max_label_category <= 6) return name_gap + 20;
+      if (max_label_category > 6 && max_label_category <= 15) return name_gap + 40;
+      if (max_label_category > 15 && max_label_category <= 24) return name_gap + 65;
+    } else {
+      return name_gap + 20;
+    }
+  }
+  return name_gap;
 }

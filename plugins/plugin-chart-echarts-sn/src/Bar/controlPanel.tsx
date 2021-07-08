@@ -18,10 +18,9 @@
  */
 import React from 'react';
 import { t, validateNonEmpty } from '@superset-ui/core';
-import { ControlPanelConfig, /*D3_FORMAT_OPTIONS,*/ sections } from '@superset-ui/chart-controls';
-import { D3_VALUE_FORMAT_OPTIONS } from '../constants';
+import { ControlPanelConfig, sections } from '@superset-ui/chart-controls';
+import { D3_FORMAT_OPTIONS_N } from '../constants';
 
-// import { DEFAULT_FORM_DATA } from './types';
 import {
   showLegendControl,
   legendTypeControl,
@@ -40,20 +39,8 @@ import {
   sortOrder,
   ValueAxisLabel,
   CategoryAxisLabel,
+  tooltipDisplay,
 } from '../controls';
-
-// const {
-//   donut,
-//   innerRadius,
-//   labelsOutside,
-//   labelType,
-//   labelLine,
-//   outerRadius,
-//   numberFormat,
-//   showLabels,
-// } = DEFAULT_FORM_DATA;
-
-// const noopControl = { name: 'noop', config: { type: '', renderTrigger: true } };
 
 const config: ControlPanelConfig = {
   controlPanelSections: [
@@ -62,7 +49,7 @@ const config: ControlPanelConfig = {
       label: t('Query'),
       expanded: true,
       controlSetRows: [
-        ['metric'],
+        ['metrics'],
         ['adhoc_filters'],
         ['groupby'],
         ['columns'],
@@ -85,11 +72,7 @@ const config: ControlPanelConfig = {
         [legendMarginControl],
         [showBarValue],
         [barStacked],
-        // ['y_axis_format'],
-        // [yAxisLabel],
-        // [showControls, null],
-        // [yAxisShowMinmax],
-        // [yAxisBounds],
+        [tooltipDisplay],
       ],
     },
     {
@@ -123,24 +106,13 @@ const config: ControlPanelConfig = {
     },
     y_axis_format: {
       label: t('Value Axis Format'),
-      choices: D3_VALUE_FORMAT_OPTIONS,
+      choices: D3_FORMAT_OPTIONS_N,
       default: '',
+    },
+    time_range: {
+      default: 'No filter',
     },
   },
 };
 
 export default config;
-
-/*
-   controlOverrides: {
-     groupby: {
-       label: t('Series'),
-       validators: [validateNonEmpty],
-     },
-     columns: {
-       label: t('Breakdowns'),
-       description: t('Defines how each series is broken down'),
-     },
-   },
- };
- */
