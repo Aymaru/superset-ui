@@ -20,6 +20,8 @@
 import d3 from 'd3';
 import PropTypes from 'prop-types';
 import {
+  getNumberFormatterRegistry,
+  createD3NumberFormatter,
   getNumberFormatter,
   NumberFormats,
   CategoricalColorNamespace,
@@ -44,6 +46,19 @@ const propTypes = {
     ]),
   ),
 };
+
+getNumberFormatterRegistry().registerValue(
+  'float-bcr',
+
+  createD3NumberFormatter({
+    locale: {
+      decimal: '.',
+      thousands: ',',
+      grouping: [3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+    },
+    formatString: ',.2f',
+  }),
+);
 
 function metricLabel(metric) {
   return typeof metric === 'string' || metric instanceof String ? metric : metric.label;
@@ -196,8 +211,8 @@ function Sunburst(element, props) {
     .innerRadius(d => Math.sqrt(d.y))
     .outerRadius(d => Math.sqrt(d.y + d.dy));
 
-  const formatNum = getNumberFormatter(numberFormat || NumberFormats.SI_3_DIGIT);
-  const formatPerc = getNumberFormatter(NumberFormats.PERCENT_3_POINT);
+  const formatNum = getNumberFormatter(numberFormat || 'float-bcr');
+  const formatPerc = getNumberFormatter(NumberFormats.PERCENT_2_POINT);
 
   container.select('svg').remove();
 
@@ -345,7 +360,7 @@ function Sunburst(element, props) {
       .append('text')
       .attr('class', 'path-abs-percent')
       .attr('y', yOffsets[offsetIndex])
-      .text(`${absolutePercString} of total`);
+      .text(`${absolutePercString} del total`);
 
     if (conditionalPercString) {
       offsetIndex += 1;
