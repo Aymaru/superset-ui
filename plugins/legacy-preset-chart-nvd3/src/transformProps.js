@@ -18,7 +18,7 @@
  */
 import isTruthy from './utils/isTruthy';
 import { tokenizeToNumericArray, tokenizeToStringArray } from './utils/tokenize';
-import { formatLabel } from './utils';
+import { formatLabel, sorter } from './utils';
 
 const NOOP = () => {};
 
@@ -38,7 +38,7 @@ export default function transformProps(chartProps) {
   const { width, height, annotationData, datasource, formData, hooks, queriesData } = chartProps;
 
   const { onAddFilter = NOOP, onError = NOOP } = hooks;
-
+  console.log(formData);
   const {
     annotationLayers,
     barStacked,
@@ -83,6 +83,7 @@ export default function transformProps(chartProps) {
     yAxisShowminmax,
     yAxis2Showminmax,
     yLogScale,
+    orderBarsAscending,
   } = formData;
 
   let {
@@ -98,6 +99,39 @@ export default function transformProps(chartProps) {
   } = formData;
 
   const rawData = queriesData[0].data || [];
+
+  const arr = rawData[0].values;
+  console.log('raw data');
+  console.log(rawData);
+  console.log('values from raw data');
+  console.log(arr);
+
+  const alphaNumericSort = (arr = []) => {
+    const sorter = (a, b) => {
+      const isNumber = v => (+v).toString() === v;
+      const aPart = a.x.match(/\d+|\D+/g);
+      const bPart = b.x.match(/\d+|\D+/g);
+      let i = 0;
+      let len = Math.min(aPart.length, bPart.length);
+      while (i < len && aPart[i] === bPart[i]) {
+        i++;
+      }
+      if (i === len) {
+        return orderBarsAscending ? aPart.length - bPart.length : bPart.length - aPart.length;
+      }
+      if (isNumber(aPart[i]) && isNumber(bPart[i])) {
+        return orderBarsAscending ? aPart[i] - bPart[i] : bPart[i] - aPart[i];
+      }
+      return orderBarsAscending
+        ? aPart[i].localeCompare(bPart[i])
+        : bPart[i].localeCompare(aPart[i]);
+    };
+    arr.sort(sorter);
+  };
+  alphaNumericSort(arr);
+
+  console.log('values from raw data sorted');
+  console.log(arr);
   const data = Array.isArray(rawData)
     ? rawData.map(row => ({
         ...row,

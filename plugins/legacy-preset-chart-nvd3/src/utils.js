@@ -421,3 +421,22 @@ export function computeStackedYDomain(data) {
 
   return [0, 1];
 }
+
+// const arr = ['A1', 'A10', 'A11', 'A12', 'A3A', 'A3B', 'A3', 'A4', 'B10', 'B2', 'F1', '1', '2', 'F3'];
+export function sorter(a, b) {
+  const isNumber = v => (+v).toString() === v;
+  const aPart = a.match(/\d+|\D+/g);
+  const bPart = b.match(/\d+|\D+/g);
+  let i = 0;
+  let len = Math.min(aPart.length, bPart.length);
+  while (i < len && aPart[i] === bPart[i]) {
+    i++;
+  }
+  if (i === len) {
+    return aPart.length - bPart.length;
+  }
+  if (isNumber(aPart[i]) && isNumber(bPart[i])) {
+    return aPart[i] - bPart[i];
+  }
+  return aPart[i].localeCompare(bPart[i]);
+}

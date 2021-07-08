@@ -90,6 +90,18 @@ const config: ControlPanelConfig = {
             },
           },
         ],
+        [
+          {
+            name: 'order_bars_ascending',
+            config: {
+              type: 'CheckboxControl',
+              label: t('Sort Bars Ascending'),
+              default: true,
+              renderTrigger: true,
+              description: t('Sort bars by x labels. Check for ascending, unchek for descending.'),
+            },
+          },
+        ],
         ['y_axis_format'],
         [yAxisLabel],
         [showControls, null],
