@@ -223,13 +223,26 @@ export const xTicksLayout = {
   config: {
     type: 'SelectControl',
     label: t('X Tick Layout'),
-    choices: formatSelectOptions(['auto', 'flat', '45°', 'staggered']),
+    choices: formatSelectOptions(['auto', 'flat', '45°']),
     default: 'auto',
     clearable: false,
     renderTrigger: true,
     description: t('The way the ticks are laid out on the X-axis'),
   },
 };
+
+// export const xTicksLayout = {
+//   name: 'x_ticks_layout',
+//   config: {
+//     type: 'SelectControl',
+//     label: t('X Tick Layout'),
+//     choices: formatSelectOptions(['auto', 'flat', '45°', 'staggered']),
+//     default: 'auto',
+//     clearable: false,
+//     renderTrigger: true,
+//     description: t('The way the ticks are laid out on the X-axis'),
+//   },
+// };
 
 export const yAxisBounds = {
   name: 'y_axis_bounds',
@@ -310,7 +323,7 @@ export const ValueAxisLabel = {
   name: 'value_axis_label',
   config: {
     type: 'TextControl',
-    label: t('Category Axis Label'),
+    label: t('Value Axis Label'),
     renderTrigger: true,
     default: '',
   },

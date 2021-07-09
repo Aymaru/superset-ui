@@ -192,3 +192,8 @@ export function get_cr_currency() {
     }),
   );
 }
+
+export function getLabelRotation(xTicksLayout: string): number {
+  if (xTicksLayout === '45°') return -45;
+  else return 0;
+}

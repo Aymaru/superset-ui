@@ -154,11 +154,6 @@ export function get_name_gap(
   isHorizontalBar: boolean,
   axis: 'value' | 'category',
 ) {
-  //isHorizontalBar ? 50 : 75, value
-  //isHorizontalBar ? 105 : 50, category
-  console.log(
-    `max label value ${max_label_value}\n max label category ${max_label_category}\n axis ${axis}`,
-  );
   var name_gap = 50;
   if (axis == 'value') {
     if (isHorizontalBar) {

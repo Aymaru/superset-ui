@@ -34,6 +34,7 @@ import {
   getChartPadding,
   getLegendProps,
   get_cr_currency,
+  getLabelRotation,
 } from '../utils/series';
 import { defaultGrid, defaultTooltip, defaultAxisLine, defaultAxis } from '../defaults';
 
@@ -59,7 +60,7 @@ get_cr_currency();
 export default function transformProps(chartProps: ChartProps): EchartsProps {
   const { width, height, formData, queriesData } = chartProps;
   const data: DataRecord[] = queriesData[0].data || [];
-  console.log(formData);
+
   const {
     colorScheme,
     groupby,
@@ -314,6 +315,8 @@ export default function transformProps(chartProps: ChartProps): EchartsProps {
   const max_label_value = barStacked ? total_values_len : metric_values_len;
   const isHorizontalBar = barOrientation === 'Horizontal';
 
+  const rotateCategoryLabel = getLabelRotation(xTicksLayout);
+
   const categoryAxis_values: AxisValues = {
     ...defaultAxis,
     type: 'category',
@@ -322,7 +325,7 @@ export default function transformProps(chartProps: ChartProps): EchartsProps {
     axisLabel: {
       show: true,
       formatter: undefined,
-      rotate: isHorizontalBar ? 0 : -45,
+      rotate: isHorizontalBar ? 0 : rotateCategoryLabel,
     },
     axisLine: {
       ...defaultAxisLine,
@@ -368,9 +371,9 @@ export default function transformProps(chartProps: ChartProps): EchartsProps {
       ...defaultGrid,
       width: 'auto',
       height: 'auto',
-      left: '4%',
-      right: '4%',
-      bottom: isHorizontalBar ? '8%' : '3%',
+      // left: '4%',
+      // right: '4%',
+      // bottom: isHorizontalBar ? '8%' : '4%',
     },
     legend: {
       ...getLegendProps(legendType, legendOrientation, showLegend),
@@ -412,7 +415,7 @@ export default function transformProps(chartProps: ChartProps): EchartsProps {
         },
     series: [...series],
   };
-  console.log(echartOptions);
+
   return {
     width,
     height,
