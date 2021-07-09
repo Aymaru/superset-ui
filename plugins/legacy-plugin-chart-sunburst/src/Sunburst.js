@@ -368,7 +368,7 @@ function Sunburst(element, props) {
         .append('text')
         .attr('class', 'path-cond-percent')
         .attr('y', yOffsets[offsetIndex])
-        .text(`${conditionalPercString} of parent`);
+        .text(`${conditionalPercString} del padre`);
     }
 
     offsetIndex += 1;
