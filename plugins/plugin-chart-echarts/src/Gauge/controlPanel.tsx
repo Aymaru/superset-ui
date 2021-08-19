@@ -23,6 +23,7 @@ import {
   ControlPanelConfig,
   D3_FORMAT_OPTIONS,
   sections,
+  emitFilterControl,
 } from '@superset-ui/chart-controls';
 import { DEFAULT_FORM_DATA } from './types';
 
@@ -45,6 +46,7 @@ const config: ControlPanelConfig = {
         ],
         ['metric'],
         ['adhoc_filters'],
+        emitFilterControl,
         [
           {
             name: 'row_limit',
@@ -141,7 +143,7 @@ const config: ControlPanelConfig = {
             config: {
               type: 'SelectControl',
               label: t('Number format'),
-              description: 'D3 format syntax: https://github.com/d3/d3-format',
+              description: t('D3 format syntax: https://github.com/d3/d3-format'),
               freeForm: true,
               renderTrigger: true,
               default: DEFAULT_FORM_DATA.numberFormat,

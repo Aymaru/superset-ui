@@ -20,6 +20,7 @@ import React, { useCallback } from 'react';
 import { EventHandlers } from '../types';
 import Echart from '../components/Echart';
 import { TimeseriesChartTransformedProps } from './types';
+import { currentSeries } from '../utils/series';
 
 // @ts-ignore
 export default function EchartsTimeseries({
@@ -29,10 +30,9 @@ export default function EchartsTimeseries({
   echartOptions,
   groupby,
   labelMap,
+  selectedValues,
   setDataMask,
 }: TimeseriesChartTransformedProps) {
-  const { filterState } = formData;
-  console.log(formData);
   const handleChange = useCallback(
     (values: string[]) => {
       if (!formData.emitFilter) {
@@ -62,32 +62,28 @@ export default function EchartsTimeseries({
         filterState: {
           label: groupbyValues.length ? groupbyValues : undefined,
           value: groupbyValues.length ? groupbyValues : null,
+          selectedValues: values.length ? values : null,
         },
       });
     },
     [groupby, labelMap, setDataMask],
   );
 
-  const selectedValues = (filterState || []).reduce(
-    (acc: Record<string, number>, selectedValue: string) => {
-      const index = Object.keys(labelMap).indexOf(selectedValue);
-      return {
-        ...acc,
-        [index]: selectedValue,
-      };
-    },
-    {},
-  );
-
   const eventHandlers: EventHandlers = {
     click: props => {
-      const { seriesId } = props;
-      const values: string[] = Object.values(selectedValues);
-      if (values.includes(seriesId)) {
-        handleChange(values.filter(v => v !== seriesId));
+      const { seriesName: name } = props;
+      const values = Object.values(selectedValues);
+      if (values.includes(name)) {
+        handleChange(values.filter(v => v !== name));
       } else {
-        handleChange([...values, seriesId]);
+        handleChange([name]);
       }
+    },
+    mousemove: params => {
+      currentSeries.name = params.seriesName;
+    },
+    mouseout: () => {
+      currentSeries.name = '';
     },
   };
 

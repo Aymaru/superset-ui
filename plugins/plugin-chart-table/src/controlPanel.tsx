@@ -23,6 +23,7 @@ import {
   ChartDataResponseResult,
   ensureIsArray,
   FeatureFlag,
+  GenericDataType,
   isFeatureEnabled,
   QueryFormColumn,
   QueryMode,
@@ -42,6 +43,7 @@ import {
   ControlPanelState,
   ExtraControlProps,
   ControlState,
+  emitFilterControl,
 } from '@superset-ui/chart-controls';
 
 import i18n from './i18n';
@@ -183,7 +185,6 @@ const config: ControlPanelConfig = {
               mapStateToProps: (state: ControlPanelState, controlState: ControlState) => {
                 const { controls } = state;
                 const originalMapStateToProps = sharedControls?.groupby?.mapStateToProps;
-                // @ts-ignore
                 const newState = originalMapStateToProps?.(state, controlState) ?? {};
                 newState.externalValidationErrors = validateAggControlValues(controls, [
                   controls.metrics?.value,
@@ -260,17 +261,20 @@ const config: ControlPanelConfig = {
             },
           },
         ],
-        [
-          {
-            name: 'server_pagination',
-            config: {
-              type: 'CheckboxControl',
-              label: t('Server pagination'),
-              description: t('Enable server side pagination of results (experimental feature)'),
-              default: false,
-            },
-          },
-        ],
+        isFeatureEnabled(FeatureFlag.DASHBOARD_CROSS_FILTERS) ||
+        isFeatureEnabled(FeatureFlag.DASHBOARD_NATIVE_FILTERS)
+          ? [
+              {
+                name: 'server_pagination',
+                config: {
+                  type: 'CheckboxControl',
+                  label: t('Server pagination'),
+                  description: t('Enable server side pagination of results (experimental feature)'),
+                  default: false,
+                },
+              },
+            ]
+          : [],
         [
           {
             name: 'row_limit',
@@ -332,6 +336,7 @@ const config: ControlPanelConfig = {
           },
         ],
         ['adhoc_filters'],
+        emitFilterControl,
       ],
     },
     {
@@ -418,22 +423,6 @@ const config: ControlPanelConfig = {
             },
           },
         ],
-        isFeatureEnabled(FeatureFlag.DASHBOARD_CROSS_FILTERS)
-          ? [
-              {
-                name: 'table_filter',
-                config: {
-                  type: 'CheckboxControl',
-                  label: t('Enable emitting filters'),
-                  renderTrigger: true,
-                  default: false,
-                  description: t(
-                    'Whether to apply filter to dashboards when table cells are clicked',
-                  ),
-                },
-              },
-            ]
-          : [],
         [
           {
             name: 'column_config',
@@ -445,6 +434,35 @@ const config: ControlPanelConfig = {
               mapStateToProps(explore, control, chart) {
                 return {
                   queryResponse: chart?.queriesResponse?.[0] as ChartDataResponseResult | undefined,
+                  emitFilter: explore?.controls?.table_filter?.value,
+                };
+              },
+            },
+          },
+        ],
+        [
+          {
+            name: 'conditional_formatting',
+            config: {
+              type: 'ConditionalFormattingControl',
+              renderTrigger: true,
+              label: t('Conditional formatting'),
+              description: t('Apply conditional color formatting to numeric columns'),
+              mapStateToProps(explore, control, chart) {
+                const verboseMap = explore?.datasource?.verbose_map ?? {};
+                const { colnames, coltypes } = chart?.queriesResponse?.[0] ?? {};
+                const numericColumns =
+                  Array.isArray(colnames) && Array.isArray(coltypes)
+                    ? colnames
+                        .filter(
+                          (colname: string, index: number) =>
+                            coltypes[index] === GenericDataType.NUMERIC,
+                        )
+                        .map(colname => ({ value: colname, label: verboseMap[colname] ?? colname }))
+                    : [];
+                return {
+                  columnOptions: numericColumns,
+                  verboseMap,
                 };
               },
             },

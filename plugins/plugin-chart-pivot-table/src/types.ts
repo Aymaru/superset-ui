@@ -23,16 +23,22 @@ import {
   SetDataMaskHook,
   DataRecordValue,
   JsonObject,
+  TimeFormatter,
+  NumberFormatter,
+  QueryFormMetric,
 } from '@superset-ui/core';
+import { ColorFormatters } from '@superset-ui/chart-controls';
 
 export interface PivotTableStylesProps {
   height: number;
   width: number;
+  margin: number;
 }
 
 export type FilterType = Record<string, DataRecordValue>;
 export type SelectedFiltersType = Record<string, DataRecordValue[]>;
 
+export type DateFormatter = TimeFormatter | NumberFormatter | ((value: DataRecordValue) => string);
 export enum MetricsLayoutEnum {
   ROWS = 'ROWS',
   COLUMNS = 'COLUMNS',
@@ -47,6 +53,7 @@ interface PivotTableCustomizeProps {
   rowOrder: string;
   aggregateFunction: string;
   transposePivot: boolean;
+  combineMetric: boolean;
   rowSubtotalPosition: boolean;
   colSubtotalPosition: boolean;
   colTotals: boolean;
@@ -55,8 +62,13 @@ interface PivotTableCustomizeProps {
   setDataMask: SetDataMaskHook;
   emitFilter?: boolean;
   selectedFilters?: SelectedFiltersType;
-  verboseMap?: JsonObject;
+  verboseMap: JsonObject;
+  columnFormats: JsonObject;
   metricsLayout?: MetricsLayoutEnum;
+  metricColorFormatters: ColorFormatters;
+  dateFormatters: Record<string, DateFormatter | undefined>;
+  timeseries_limit_metric: QueryFormMetric[] | QueryFormMetric | null;
+  order_desc: boolean;
 }
 
 export type PivotTableQueryFormData = QueryFormData &

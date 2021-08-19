@@ -20,13 +20,11 @@ import {
   AnnotationLayer,
   ChartDataResponseResult,
   ChartProps,
-  DataRecordValue,
   QueryFormData,
-  SetDataMaskHook,
   TimeGranularity,
 } from '@superset-ui/core';
-import { EChartsOption } from 'echarts';
-import { DEFAULT_LEGEND_FORM_DATA, EchartsLegendFormData } from '../types';
+import { sections } from '@superset-ui/chart-controls';
+import { DEFAULT_LEGEND_FORM_DATA, EchartsLegendFormData, EChartTransformedProps } from '../types';
 
 export enum EchartsTimeseriesContributionType {
   Row = 'row',
@@ -77,19 +75,20 @@ export type EchartsTimeseriesFormData = QueryFormData & {
   xAxisLabelRotation: number;
   emitFilter: boolean;
   groupby: string[];
+  showValue: boolean;
 } & EchartsLegendFormData;
 
 // @ts-ignore
 export const DEFAULT_FORM_DATA: EchartsTimeseriesFormData = {
   ...DEFAULT_LEGEND_FORM_DATA,
-  annotationLayers: [],
+  annotationLayers: sections.annotationLayers,
   area: false,
-  forecastEnabled: false,
-  forecastInterval: 0.8,
-  forecastPeriods: 10,
-  forecastSeasonalityDaily: null,
-  forecastSeasonalityWeekly: null,
-  forecastSeasonalityYearly: null,
+  forecastEnabled: sections.FORECAST_DEFAULT_DATA.forecastEnabled,
+  forecastInterval: sections.FORECAST_DEFAULT_DATA.forecastInterval,
+  forecastPeriods: sections.FORECAST_DEFAULT_DATA.forecastPeriods,
+  forecastSeasonalityDaily: sections.FORECAST_DEFAULT_DATA.forecastSeasonalityDaily,
+  forecastSeasonalityWeekly: sections.FORECAST_DEFAULT_DATA.forecastSeasonalityWeekly,
+  forecastSeasonalityYearly: sections.FORECAST_DEFAULT_DATA.forecastSeasonalityYearly,
   logAxis: false,
   markerEnabled: false,
   markerSize: 6,
@@ -108,6 +107,7 @@ export const DEFAULT_FORM_DATA: EchartsTimeseriesFormData = {
   emitFilter: false,
   groupby: [],
   yAxisTitle: '',
+  showValue: false,
 };
 
 export interface EchartsTimeseriesChartProps extends ChartProps {
@@ -115,13 +115,4 @@ export interface EchartsTimeseriesChartProps extends ChartProps {
   queriesData: ChartDataResponseResult[];
 }
 
-export interface TimeseriesChartTransformedProps {
-  formData: EchartsTimeseriesFormData;
-  height: number;
-  width: number;
-  echartOptions: EChartsOption;
-  emitFilter: boolean;
-  setDataMask: SetDataMaskHook;
-  labelMap: Record<string, DataRecordValue[]>;
-  groupby: string[];
-}
+export type TimeseriesChartTransformedProps = EChartTransformedProps<EchartsTimeseriesFormData>;

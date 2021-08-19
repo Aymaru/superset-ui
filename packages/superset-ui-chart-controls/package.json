@@ -1,6 +1,6 @@
 {
   "name": "@superset-ui/chart-controls",
-  "version": "0.17.60",
+  "version": "0.17.85",
   "description": "Superset UI control-utils",
   "sideEffects": false,
   "main": "lib/index.js",
@@ -26,14 +26,15 @@
     "access": "public"
   },
   "dependencies": {
-    "@superset-ui/core": "0.17.60",
+    "@react-icons/all-files": "^4.1.0",
+    "@superset-ui/core": "0.17.81",
     "lodash": "^4.17.15",
     "prop-types": "^15.7.2"
   },
   "peerDependencies": {
+    "@emotion/react": "^11.1.5",
     "@types/react": "*",
     "antd": "^4.9.4",
-    "react": "^16.13.1",
-    "react-icons": "^4.2.0"
+    "react": "^16.13.1"
   }
 }
