@@ -73,7 +73,7 @@
     "@storybook/preset-typescript": "^3.0.0",
     "@superset-ui/commit-config": "^0.0.9",
     "@types/enzyme": "^3.10.3",
-    "@types/jest": "^26.0.4",
+    "@types/jest": "^27.0.3",
     "@types/jsdom": "^12.2.4",
     "@types/react": "^16.14.2",
     "@types/react-test-renderer": "^16.9.2",
