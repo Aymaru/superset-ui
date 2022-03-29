@@ -17,7 +17,7 @@
  * under the License.
  */
 import { ChartProps, getMetricLabel, DataRecordValue } from '@superset-ui/core';
-import { EChartsOption, TreeSeriesOption } from 'echarts';
+import { EChartsCoreOption, TreeSeriesOption } from 'echarts';
 import {
   TreeSeriesCallbackDataParams,
   TreeSeriesNodeItemOption,
@@ -43,7 +43,10 @@ export function formatTooltip({
     .map(pathInfo => pathInfo?.name || '')
     .filter(path => path !== '');
 
-  return [`<div>${treePath.join(' ▸ ')}</div>`, value ? `${metricLabel}: ${value}` : ''].join('');
+  return [
+    `<div>${treePath.join(' ▸ ')}</div>`,
+    value ? `${metricLabel}: ${value}` : '',
+  ].join('');
 }
 
 export default function transformProps(chartProps: ChartProps): EchartsProps {
@@ -176,7 +179,10 @@ export default function transformProps(chartProps: ChartProps): EchartsProps {
     {
       type: 'tree',
       data: [finalTree],
-      label: { ...DEFAULT_TREE_SERIES_OPTION.label, position: nodeLabelPosition },
+      label: {
+        ...DEFAULT_TREE_SERIES_OPTION.label,
+        position: nodeLabelPosition,
+      },
       emphasis: { focus: emphasis },
       animation: DEFAULT_TREE_SERIES_OPTION.animation,
       layout,
@@ -190,7 +196,7 @@ export default function transformProps(chartProps: ChartProps): EchartsProps {
     },
   ];
 
-  const echartOptions: EChartsOption = {
+  const echartOptions: EChartsCoreOption = {
     animationDuration: DEFAULT_TREE_SERIES_OPTION.animationDuration,
     animationEasing: DEFAULT_TREE_SERIES_OPTION.animationEasing,
     series,

@@ -28,7 +28,12 @@ import {
   BRAND_COLOR,
   styled,
 } from '@superset-ui/core';
-import { XYChart, AreaSeries, CrossHair, LinearGradient } from '@data-ui/xy-chart';
+import {
+  XYChart,
+  AreaSeries,
+  CrossHair,
+  LinearGradient,
+} from '@data-ui/xy-chart';
 
 const defaultNumberFormatter = getNumberFormatter();
 
@@ -57,7 +62,11 @@ export function renderTooltipFactory(
   formatDate = smartDateVerboseFormatter,
   formatValue = defaultNumberFormatter,
 ) {
-  return function renderTooltip({ datum: { x, y } }: { datum: TimeSeriesDatum }) {
+  return function renderTooltip({
+    datum: { x, y },
+  }: {
+    datum: TimeSeriesDatum;
+  }) {
     // even though `formatDate` supports timestamp as numbers, we need
     // `new Date` to pass type check
     return (
@@ -76,7 +85,7 @@ type BigNumberVisProps = {
   height: number;
   bigNumber?: number | null;
   bigNumberFallback?: TimeSeriesDatum;
-  formatNumber: NumberFormatter;
+  headerFormatter: NumberFormatter | TimeFormatter;
   formatTime: TimeFormatter;
   fromDatetime?: number;
   toDatetime?: number;
@@ -98,7 +107,7 @@ class BigNumberVis extends React.PureComponent<BigNumberVisProps, {}> {
 
   static defaultProps = {
     className: '',
-    formatNumber: defaultNumberFormatter,
+    headerFormatter: defaultNumberFormatter,
     formatTime: smartDateVerboseFormatter,
     headerFontSize: PROPORTION.HEADER,
     kickerFontSize: PROPORTION.KICKER,
@@ -135,7 +144,10 @@ class BigNumberVis extends React.PureComponent<BigNumberVisProps, {}> {
       <span
         className="alert alert-warning"
         role="alert"
-        title={t(`Last available value seen on %s`, formatTime(bigNumberFallback.x))}
+        title={t(
+          `Last available value seen on %s`,
+          formatTime(bigNumberFallback.x),
+        )}
       >
         {t('Not up to date')}
       </span>
@@ -173,8 +185,8 @@ class BigNumberVis extends React.PureComponent<BigNumberVisProps, {}> {
   }
 
   renderHeader(maxHeight: number) {
-    const { bigNumber, formatNumber, width } = this.props;
-    const text = bigNumber === null ? t('No data') : formatNumber(bigNumber);
+    const { bigNumber, headerFormatter, width } = this.props;
+    const text = bigNumber === null ? t('No data') : headerFormatter(bigNumber);
 
     const container = this.createTemporaryContainer();
     document.body.append(container);
@@ -207,7 +219,9 @@ class BigNumberVis extends React.PureComponent<BigNumberVisProps, {}> {
     const NO_DATA_OR_HASNT_LANDED = t(
       'No data after filtering or data is NULL for the latest time record',
     );
-    const NO_DATA = t('Try applying different filters or ensuring your datasource has data');
+    const NO_DATA = t(
+      'Try applying different filters or ensuring your datasource has data',
+    );
     let text = subheader;
     if (bigNumber === null) {
       text = bigNumberFallback ? NO_DATA : NO_DATA_OR_HASNT_LANDED;
@@ -246,7 +260,7 @@ class BigNumberVis extends React.PureComponent<BigNumberVisProps, {}> {
       mainColor,
       subheader,
       startYAxisAtZero,
-      formatNumber,
+      headerFormatter,
       formatTime,
       fromDatetime,
       timeRangeFixed,
@@ -283,7 +297,11 @@ class BigNumberVis extends React.PureComponent<BigNumberVisProps, {}> {
       <XYChart
         snapTooltipToDataX
         ariaLabel={`Big number visualization ${subheader}`}
-        renderTooltip={renderTooltipFactory(formatTime, formatNumber)}
+        // headerFormatter always NumberFormatter in BigNumber with treadline
+        renderTooltip={renderTooltipFactory(
+          formatTime,
+          headerFormatter as NumberFormatter,
+        )}
         xScale={xScale}
         yScale={{
           type: 'linear',
@@ -295,7 +313,11 @@ class BigNumberVis extends React.PureComponent<BigNumberVisProps, {}> {
         eventTrigger="container"
       >
         <LinearGradient id={this.gradientId} from={mainColor} to="#fff" />
-        <AreaSeries data={tooltipData} fill={`url(#${this.gradientId})`} stroke={mainColor} />
+        <AreaSeries
+          data={tooltipData}
+          fill={`url(#${this.gradientId})`}
+          stroke={mainColor}
+        />
         <CrossHair
           fullHeight
           stroke={mainColor}
@@ -309,7 +331,13 @@ class BigNumberVis extends React.PureComponent<BigNumberVisProps, {}> {
   }
 
   render() {
-    const { showTrendLine, height, kickerFontSize, headerFontSize, subheaderFontSize } = this.props;
+    const {
+      showTrendLine,
+      height,
+      kickerFontSize,
+      headerFontSize,
+      subheaderFontSize,
+    } = this.props;
     const className = this.getClassName();
 
     if (showTrendLine) {
@@ -320,10 +348,16 @@ class BigNumberVis extends React.PureComponent<BigNumberVisProps, {}> {
         <div className={className}>
           <div className="text-container" style={{ height: allTextHeight }}>
             {this.renderFallbackWarning()}
-            {this.renderKicker(Math.ceil(kickerFontSize * (1 - PROPORTION.TRENDLINE) * height))}
-            {this.renderHeader(Math.ceil(headerFontSize * (1 - PROPORTION.TRENDLINE) * height))}
+            {this.renderKicker(
+              Math.ceil(kickerFontSize * (1 - PROPORTION.TRENDLINE) * height),
+            )}
+            {this.renderHeader(
+              Math.ceil(headerFontSize * (1 - PROPORTION.TRENDLINE) * height),
+            )}
             {this.renderSubheader(
-              Math.ceil(subheaderFontSize * (1 - PROPORTION.TRENDLINE) * height),
+              Math.ceil(
+                subheaderFontSize * (1 - PROPORTION.TRENDLINE) * height,
+              ),
             )}
           </div>
           {this.renderTrendline(chartHeight)}

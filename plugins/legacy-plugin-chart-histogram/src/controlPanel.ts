@@ -16,15 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { FeatureFlag, isFeatureEnabled, t, validateNonEmpty } from '@superset-ui/core';
+import {
+  FeatureFlag,
+  isFeatureEnabled,
+  t,
+  validateNonEmpty,
+} from '@superset-ui/core';
 import {
   columnChoices,
   ControlPanelConfig,
   ControlPanelState,
   formatSelectOptions,
   sections,
+  dndColumnsControl,
 } from '@superset-ui/chart-controls';
-import { dndColumnsControl } from '@superset-ui/chart-controls/lib/shared-controls/dndControls';
 
 const allColumns = {
   type: 'SelectControl',
@@ -70,7 +75,7 @@ const config: ControlPanelConfig = {
       label: t('Chart Options'),
       expanded: true,
       controlSetRows: [
-        ['color_scheme', 'label_colors'],
+        ['color_scheme'],
         [
           {
             name: 'link_length',
@@ -80,7 +85,16 @@ const config: ControlPanelConfig = {
               freeForm: true,
               label: t('No of Bins'),
               default: 5,
-              choices: formatSelectOptions(['10', '25', '50', '75', '100', '150', '200', '250']),
+              choices: formatSelectOptions([
+                '10',
+                '25',
+                '50',
+                '75',
+                '100',
+                '150',
+                '200',
+                '250',
+              ]),
               description: t('Select the number of bins for the histogram'),
             },
           },
@@ -127,6 +141,18 @@ const config: ControlPanelConfig = {
               label: t('Normalized'),
               renderTrigger: true,
               description: t('Whether to normalize the histogram'),
+              default: false,
+            },
+          },
+        ],
+        [
+          {
+            name: 'cumulative',
+            config: {
+              type: 'CheckboxControl',
+              label: t('Cumulative'),
+              renderTrigger: true,
+              description: t('Whether to make the histogram cumulative'),
               default: false,
             },
           },

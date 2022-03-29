@@ -20,11 +20,18 @@ import {
   AnnotationLayer,
   ChartDataResponseResult,
   ChartProps,
+  QueryFormColumn,
   QueryFormData,
   TimeGranularity,
 } from '@superset-ui/core';
 import { sections } from '@superset-ui/chart-controls';
-import { DEFAULT_LEGEND_FORM_DATA, EchartsLegendFormData, EChartTransformedProps } from '../types';
+import {
+  DEFAULT_LEGEND_FORM_DATA,
+  EchartsLegendFormData,
+  EChartTransformedProps,
+  EchartsTitleFormData,
+  DEFAULT_TITLE_FORM_DATA,
+} from '../types';
 
 export enum EchartsTimeseriesContributionType {
   Row = 'row',
@@ -64,9 +71,6 @@ export type EchartsTimeseriesFormData = QueryFormData & {
   tooltipTimeFormat?: string;
   truncateYAxis: boolean;
   yAxisFormat?: string;
-  yAxisTitle: string;
-  xAxisShowMinLabel?: boolean;
-  xAxisShowMaxLabel?: boolean;
   xAxisTimeFormat?: string;
   timeGrainSqla?: TimeGranularity;
   yAxisBounds: [number | undefined | null, number | undefined | null];
@@ -74,9 +78,11 @@ export type EchartsTimeseriesFormData = QueryFormData & {
   richTooltip: boolean;
   xAxisLabelRotation: number;
   emitFilter: boolean;
-  groupby: string[];
+  groupby: QueryFormColumn[];
   showValue: boolean;
-} & EchartsLegendFormData;
+  onlyTotal: boolean;
+} & EchartsLegendFormData &
+  EchartsTitleFormData;
 
 // @ts-ignore
 export const DEFAULT_FORM_DATA: EchartsTimeseriesFormData = {
@@ -86,9 +92,12 @@ export const DEFAULT_FORM_DATA: EchartsTimeseriesFormData = {
   forecastEnabled: sections.FORECAST_DEFAULT_DATA.forecastEnabled,
   forecastInterval: sections.FORECAST_DEFAULT_DATA.forecastInterval,
   forecastPeriods: sections.FORECAST_DEFAULT_DATA.forecastPeriods,
-  forecastSeasonalityDaily: sections.FORECAST_DEFAULT_DATA.forecastSeasonalityDaily,
-  forecastSeasonalityWeekly: sections.FORECAST_DEFAULT_DATA.forecastSeasonalityWeekly,
-  forecastSeasonalityYearly: sections.FORECAST_DEFAULT_DATA.forecastSeasonalityYearly,
+  forecastSeasonalityDaily:
+    sections.FORECAST_DEFAULT_DATA.forecastSeasonalityDaily,
+  forecastSeasonalityWeekly:
+    sections.FORECAST_DEFAULT_DATA.forecastSeasonalityWeekly,
+  forecastSeasonalityYearly:
+    sections.FORECAST_DEFAULT_DATA.forecastSeasonalityYearly,
   logAxis: false,
   markerEnabled: false,
   markerSize: 6,
@@ -99,15 +108,16 @@ export const DEFAULT_FORM_DATA: EchartsTimeseriesFormData = {
   seriesType: EchartsTimeseriesSeriesType.Line,
   stack: false,
   tooltipTimeFormat: 'smart_date',
-  truncateYAxis: true,
+  truncateYAxis: false,
   yAxisBounds: [null, null],
   zoomable: false,
   richTooltip: true,
   xAxisLabelRotation: 0,
   emitFilter: false,
   groupby: [],
-  yAxisTitle: '',
   showValue: false,
+  onlyTotal: false,
+  ...DEFAULT_TITLE_FORM_DATA,
 };
 
 export interface EchartsTimeseriesChartProps extends ChartProps {
@@ -115,4 +125,5 @@ export interface EchartsTimeseriesChartProps extends ChartProps {
   queriesData: ChartDataResponseResult[];
 }
 
-export type TimeseriesChartTransformedProps = EChartTransformedProps<EchartsTimeseriesFormData>;
+export type TimeseriesChartTransformedProps =
+  EChartTransformedProps<EchartsTimeseriesFormData>;

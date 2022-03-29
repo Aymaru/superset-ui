@@ -25,7 +25,11 @@ import {
   PostProcessingCum,
   ComparisionType,
 } from '@superset-ui/core';
-import { getMetricOffsetsMap, isValidTimeCompare, TIME_COMPARISON_SEPARATOR } from './utils';
+import {
+  getMetricOffsetsMap,
+  isValidTimeCompare,
+  TIME_COMPARISON_SEPARATOR,
+} from './utils';
 import { PostProcessingFactory } from './types';
 
 export const rollingWindowOperator: PostProcessingFactory<
@@ -37,9 +41,12 @@ export const rollingWindowOperator: PostProcessingFactory<
     const comparisonType = formData.comparison_type;
     if (comparisonType === ComparisionType.Values) {
       // time compare type: actual values
-      columns = [...Array.from(metricsMap.values()), ...Array.from(metricsMap.keys())];
+      columns = [
+        ...Array.from(metricsMap.values()),
+        ...Array.from(metricsMap.keys()),
+      ];
     } else {
-      // time compare type: absolute / percentage / ratio
+      // time compare type: difference / percentage / ratio
       columns = Array.from(metricsMap.entries()).map(([offset, metric]) =>
         [comparisonType, metric, offset].join(TIME_COMPARISON_SEPARATOR),
       );
@@ -60,11 +67,16 @@ export const rollingWindowOperator: PostProcessingFactory<
       options: {
         operator: 'sum',
         columns: columnsMap,
+        is_pivot_df: true,
       },
     };
   }
 
-  if ([RollingType.Sum, RollingType.Mean, RollingType.Std].includes(formData.rolling_type)) {
+  if (
+    [RollingType.Sum, RollingType.Mean, RollingType.Std].includes(
+      formData.rolling_type,
+    )
+  ) {
     return {
       operation: 'rolling',
       options: {
@@ -72,6 +84,7 @@ export const rollingWindowOperator: PostProcessingFactory<
         window: ensureIsInt(formData.rolling_periods, 1),
         min_periods: ensureIsInt(formData.min_periods, 0),
         columns: columnsMap,
+        is_pivot_df: true,
       },
     };
   }

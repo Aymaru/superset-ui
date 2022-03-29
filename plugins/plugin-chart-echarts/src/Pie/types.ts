@@ -16,11 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { EChartsOption } from 'echarts';
+import { EChartsCoreOption } from 'echarts';
 import {
   ChartDataResponseResult,
   ChartProps,
   DataRecordValue,
+  QueryFormColumn,
   QueryFormData,
   SetDataMaskHook,
 } from '@superset-ui/core';
@@ -37,7 +38,7 @@ export type EchartsPieFormData = QueryFormData &
     currentOwnValue?: string[] | null;
     donut: boolean;
     defaultValue?: string[] | null;
-    groupby: string[];
+    groupby: QueryFormColumn[];
     innerRadius: number;
     labelLine: boolean;
     labelType: EchartsPieLabelType;
@@ -88,10 +89,10 @@ export interface PieChartTransformedProps {
   formData: EchartsPieFormData;
   height: number;
   width: number;
-  echartOptions: EChartsOption;
+  echartOptions: EChartsCoreOption;
   emitFilter: boolean;
   setDataMask: SetDataMaskHook;
   labelMap: Record<string, DataRecordValue[]>;
-  groupby: string[];
+  groupby: QueryFormColumn[];
   selectedValues: Record<number, string>;
 }

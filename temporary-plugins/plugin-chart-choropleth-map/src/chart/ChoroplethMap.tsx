@@ -111,12 +111,18 @@ class ChoroplethMap extends React.PureComponent<
     if (prevProps.map !== this.props.map) {
       this.loadMap();
     }
-    if (prevProps.data !== this.props.data || prevProps.encoding !== this.props.encoding) {
+    if (
+      prevProps.data !== this.props.data ||
+      prevProps.encoding !== this.props.encoding
+    ) {
       this.processData();
     }
   }
 
-  handleMouseOver = (event: React.MouseEvent<SVGPathElement>, datum?: MapDataPoint) => {
+  handleMouseOver = (
+    event: React.MouseEvent<SVGPathElement>,
+    datum?: MapDataPoint,
+  ) => {
     const coords = localPoint(event);
     this.props.showTooltip({
       tooltipLeft: coords?.x,
@@ -145,7 +151,10 @@ class ChoroplethMap extends React.PureComponent<
         fill: fill.encodeDatum(d, DefaultChannelOutputs.fill),
         opacity: opacity.encodeDatum(d, DefaultChannelOutputs.opacity),
         stroke: stroke.encodeDatum(d, DefaultChannelOutputs.stroke),
-        strokeWidth: strokeWidth.encodeDatum(d, DefaultChannelOutputs.strokeWidth),
+        strokeWidth: strokeWidth.encodeDatum(
+          d,
+          DefaultChannelOutputs.strokeWidth,
+        ),
         datum: d,
       })),
       d => d.key,
@@ -265,7 +274,12 @@ class ChoroplethMap extends React.PureComponent<
                 </g>
                 {showMiniMap && (
                   <g clipPath="url(#zoom-clip)" transform={miniMapTransform}>
-                    <rect width={width} height={height} fill="#fff" stroke="#999" />
+                    <rect
+                      width={width}
+                      height={height}
+                      fill="#fff"
+                      stroke="#999"
+                    />
                     {renderedMap}
                     <rect
                       width={width}
@@ -280,10 +294,16 @@ class ChoroplethMap extends React.PureComponent<
                 )}
               </svg>
               <ZoomControls>
-                <IconButton type="button" onClick={() => zoom.scale({ scaleX: 1.2, scaleY: 1.2 })}>
+                <IconButton
+                  type="button"
+                  onClick={() => zoom.scale({ scaleX: 1.2, scaleY: 1.2 })}
+                >
                   +
                 </IconButton>
-                <IconButton type="button" onClick={() => zoom.scale({ scaleX: 0.8, scaleY: 0.8 })}>
+                <IconButton
+                  type="button"
+                  onClick={() => zoom.scale({ scaleX: 0.8, scaleY: 0.8 })}
+                >
                   -
                 </IconButton>
                 <TextButton

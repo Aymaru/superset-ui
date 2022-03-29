@@ -19,18 +19,24 @@
 import React, { useCallback, useMemo } from 'react';
 import { PlusSquareOutlined, MinusSquareOutlined } from '@ant-design/icons';
 import {
-  styled,
   AdhocMetric,
-  getNumberFormatter,
   DataRecordValue,
+  getColumnLabel,
+  getNumberFormatter,
+  isPhysicalColumn,
   NumberFormatter,
+  styled,
   useTheme,
 } from '@superset-ui/core';
 // @ts-ignore
 import PivotTable from '@superset-ui/react-pivottable/PivotTable';
-// @ts-ignore
-import { sortAs, aggregatorTemplates } from '@superset-ui/react-pivottable/Utilities';
+import {
+  sortAs,
+  aggregatorTemplates,
+  // @ts-ignore
+} from '@superset-ui/react-pivottable/Utilities';
 import '@superset-ui/react-pivottable/pivottable.css';
+import { isAdhocColumn } from '@superset-ui/chart-controls';
 import {
   FilterType,
   MetricsLayoutEnum,
@@ -43,9 +49,16 @@ const Styles = styled.div<PivotTableStylesProps>`
   ${({ height, width, margin }) => `
       margin: ${margin}px;
       height: ${height - margin * 2}px;
-      width: ${width - margin * 2}px;
-      overflow-y: scroll;
+      width: ${
+        typeof width === 'string' ? parseInt(width, 10) : width - margin * 2
+      }px;
  `}
+`;
+
+const PivotTableWrapper = styled.div`
+  height: 100%;
+  max-width: fit-content;
+  overflow: auto;
 `;
 
 const METRIC_KEY = 'metric';
@@ -105,8 +118,8 @@ export default function PivotTableChart(props: PivotTableProps) {
     data,
     height,
     width,
-    groupbyRows,
-    groupbyColumns,
+    groupbyRows: groupbyRowsRaw,
+    groupbyColumns: groupbyColumnsRaw,
     metrics,
     colOrder,
     rowOrder,
@@ -135,7 +148,10 @@ export default function PivotTableChart(props: PivotTableProps) {
   const metricFormatters =
     hasCustomMetricFormatters &&
     Object.fromEntries(
-      columnFormatsArray.map(([metric, format]) => [metric, getNumberFormatter(format)]),
+      columnFormatsArray.map(([metric, format]) => [
+        metric,
+        getNumberFormatter(format),
+      ]),
     );
 
   const metricNames = useMemo(
@@ -163,8 +179,12 @@ export default function PivotTableChart(props: PivotTableProps) {
       ),
     [data, metricNames],
   );
+  const groupbyRows = groupbyRowsRaw.map(getColumnLabel);
+  const groupbyColumns = groupbyColumnsRaw.map(getColumnLabel);
 
-  let [rows, cols] = transposePivot ? [groupbyColumns, groupbyRows] : [groupbyRows, groupbyColumns];
+  let [rows, cols] = transposePivot
+    ? [groupbyColumns, groupbyRows]
+    : [groupbyRows, groupbyColumns];
 
   if (metricsLayout === MetricsLayoutEnum.ROWS) {
     rows = combineMetric ? [...rows, METRIC_KEY] : [METRIC_KEY, ...rows];
@@ -174,14 +194,25 @@ export default function PivotTableChart(props: PivotTableProps) {
 
   const handleChange = useCallback(
     (filters: SelectedFiltersType) => {
-      const groupBy = Object.keys(filters);
+      const filterKeys = Object.keys(filters);
+      const groupby = [...groupbyRowsRaw, ...groupbyColumnsRaw];
       setDataMask({
         extraFormData: {
           filters:
-            groupBy.length === 0
+            filterKeys.length === 0
               ? undefined
-              : groupBy.map(col => {
-                  const val = filters?.[col];
+              : filterKeys.map(key => {
+                  const val = filters?.[key];
+                  const col =
+                    groupby.find(item => {
+                      if (isPhysicalColumn(item)) {
+                        return item === key;
+                      }
+                      if (isAdhocColumn(item)) {
+                        return item.label === key;
+                      }
+                      return false;
+                    }) ?? '';
                   if (val === null || val === undefined)
                     return {
                       col,
@@ -195,8 +226,12 @@ export default function PivotTableChart(props: PivotTableProps) {
                 }),
         },
         filterState: {
-          value: filters && Object.keys(filters).length ? Object.values(filters) : null,
-          selectedFilters: filters && Object.keys(filters).length ? filters : null,
+          value:
+            filters && Object.keys(filters).length
+              ? Object.values(filters)
+              : null,
+          selectedFilters:
+            filters && Object.keys(filters).length ? filters : null,
         },
       });
     },
@@ -244,7 +279,10 @@ export default function PivotTableChart(props: PivotTableProps) {
           [key]: [val],
         };
       }
-      if (Array.isArray(updatedFilters[key]) && updatedFilters[key].length === 0) {
+      if (
+        Array.isArray(updatedFilters[key]) &&
+        updatedFilters[key].length === 0
+      ) {
         delete updatedFilters[key];
       }
       handleChange(updatedFilters);
@@ -254,42 +292,46 @@ export default function PivotTableChart(props: PivotTableProps) {
 
   return (
     <Styles height={height} width={width} margin={theme.gridUnit * 4}>
-      <PivotTable
-        data={unpivotedData}
-        rows={rows}
-        cols={cols}
-        aggregatorsFactory={aggregatorsFactory}
-        defaultFormatter={defaultFormatter}
-        customFormatters={
-          hasCustomMetricFormatters ? { [METRIC_KEY]: metricFormatters } : undefined
-        }
-        aggregatorName={aggregateFunction}
-        vals={['value']}
-        rendererName="Table With Subtotal"
-        colOrder={colOrder}
-        rowOrder={rowOrder}
-        sorters={{
-          metric: sortAs(metricNames),
-        }}
-        tableOptions={{
-          clickRowHeaderCallback: toggleFilter,
-          clickColumnHeaderCallback: toggleFilter,
-          colTotals,
-          rowTotals,
-          highlightHeaderCellsOnHover: emitFilter,
-          highlightedHeaderCells: selectedFilters,
-          omittedHighlightHeaderGroups: [METRIC_KEY],
-          cellColorFormatters: { [METRIC_KEY]: metricColorFormatters },
-          dateFormatters,
-        }}
-        subtotalOptions={{
-          colSubtotalDisplay: { displayOnTop: colSubtotalPosition },
-          rowSubtotalDisplay: { displayOnTop: rowSubtotalPosition },
-          arrowCollapsed: <PlusSquareOutlined style={iconStyle} />,
-          arrowExpanded: <MinusSquareOutlined style={iconStyle} />,
-        }}
-        namesMapping={verboseMap}
-      />
+      <PivotTableWrapper>
+        <PivotTable
+          data={unpivotedData}
+          rows={rows}
+          cols={cols}
+          aggregatorsFactory={aggregatorsFactory}
+          defaultFormatter={defaultFormatter}
+          customFormatters={
+            hasCustomMetricFormatters
+              ? { [METRIC_KEY]: metricFormatters }
+              : undefined
+          }
+          aggregatorName={aggregateFunction}
+          vals={['value']}
+          rendererName="Table With Subtotal"
+          colOrder={colOrder}
+          rowOrder={rowOrder}
+          sorters={{
+            metric: sortAs(metricNames),
+          }}
+          tableOptions={{
+            clickRowHeaderCallback: toggleFilter,
+            clickColumnHeaderCallback: toggleFilter,
+            colTotals,
+            rowTotals,
+            highlightHeaderCellsOnHover: emitFilter,
+            highlightedHeaderCells: selectedFilters,
+            omittedHighlightHeaderGroups: [METRIC_KEY],
+            cellColorFormatters: { [METRIC_KEY]: metricColorFormatters },
+            dateFormatters,
+          }}
+          subtotalOptions={{
+            colSubtotalDisplay: { displayOnTop: colSubtotalPosition },
+            rowSubtotalDisplay: { displayOnTop: rowSubtotalPosition },
+            arrowCollapsed: <PlusSquareOutlined style={iconStyle} />,
+            arrowExpanded: <MinusSquareOutlined style={iconStyle} />,
+          }}
+          namesMapping={verboseMap}
+        />
+      </PivotTableWrapper>
     </Styles>
   );
 }

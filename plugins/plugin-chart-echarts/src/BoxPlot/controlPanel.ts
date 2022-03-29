@@ -24,9 +24,10 @@ import {
   formatSelectOptions,
   sections,
   emitFilterControl,
+  ControlPanelConfig,
 } from '@superset-ui/chart-controls';
 
-export default {
+const config: ControlPanelConfig = {
   controlPanelSections: [
     sections.legacyTimeseriesTime,
     {
@@ -37,17 +38,21 @@ export default {
         ['adhoc_filters'],
         emitFilterControl,
         ['groupby'],
-        ['columns'],
-        ['limit'],
+        ['columns'], // TODO: this should be migrated to `series_columns`
+        ['series_limit'],
+        ['series_limit_metric'],
         [
           {
             name: 'whiskerOptions',
             config: {
+              clearable: false,
               type: 'SelectControl',
               freeForm: true,
               label: t('Whisker/outlier options'),
               default: 'Tukey',
-              description: t('Determines how whiskers and outliers are calculated.'),
+              description: t(
+                'Determines how whiskers and outliers are calculated.',
+              ),
               choices: formatSelectOptions([
                 'Tukey',
                 'Min/max (no outliers)',
@@ -59,6 +64,7 @@ export default {
         ],
       ],
     },
+    sections.titleControls,
     {
       label: t('Chart Options'),
       expanded: true,
@@ -70,7 +76,13 @@ export default {
             config: {
               type: 'SelectControl',
               label: t('X Tick Layout'),
-              choices: formatSelectOptions(['auto', 'flat', '45°', '90°', 'staggered']),
+              choices: formatSelectOptions([
+                'auto',
+                'flat',
+                '45°',
+                '90°',
+                'staggered',
+              ]),
               default: 'auto',
               clearable: false,
               renderTrigger: true,
@@ -88,9 +100,9 @@ export default {
               renderTrigger: true,
               default: 'SMART_NUMBER',
               choices: D3_FORMAT_OPTIONS,
-              description: `${t('D3 format syntax: https://github.com/d3/d3-format')} ${t(
-                'Only applies when "Label Type" is set to show values.',
-              )}`,
+              description: `${t(
+                'D3 format syntax: https://github.com/d3/d3-format',
+              )} ${t('Only applies when "Label Type" is set to show values.')}`,
             },
           },
         ],
@@ -125,3 +137,4 @@ export default {
     },
   },
 };
+export default config;

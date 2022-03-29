@@ -18,11 +18,11 @@
  */
 import {
   buildQueryContext,
-  getMetricLabel,
   QueryFormData,
   QueryObject,
   normalizeOrderBy,
 } from '@superset-ui/core';
+import { pivotOperator } from '@superset-ui/chart-controls';
 
 export default function buildQuery(formData: QueryFormData) {
   const {
@@ -61,44 +61,22 @@ export default function buildQuery(formData: QueryFormData) {
   };
 
   const queryContextA = buildQueryContext(formData1, baseQueryObject => {
-    const metricLabels = (baseQueryObject.metrics || []).map(getMetricLabel);
     const queryObjectA = {
       ...baseQueryObject,
       is_timeseries: true,
       post_processing: [
-        {
-          operation: 'pivot',
-          options: {
-            index: ['__timestamp'],
-            columns: formData1.columns || [],
-            // Create 'dummy' sum aggregates to assign cell values in pivot table
-            aggregates: Object.fromEntries(
-              metricLabels.map(metric => [metric, { operator: 'sum' }]),
-            ),
-          },
-        },
+        pivotOperator(formData1, { ...baseQueryObject, is_timeseries: true }),
       ],
     } as QueryObject;
     return [normalizeOrderBy(queryObjectA)];
   });
 
   const queryContextB = buildQueryContext(formData2, baseQueryObject => {
-    const metricLabels = (baseQueryObject.metrics || []).map(getMetricLabel);
     const queryObjectB = {
       ...baseQueryObject,
       is_timeseries: true,
       post_processing: [
-        {
-          operation: 'pivot',
-          options: {
-            index: ['__timestamp'],
-            columns: formData2.columns || [],
-            // Create 'dummy' sum aggregates to assign cell values in pivot table
-            aggregates: Object.fromEntries(
-              metricLabels.map(metric => [metric, { operator: 'sum' }]),
-            ),
-          },
-        },
+        pivotOperator(formData2, { ...baseQueryObject, is_timeseries: true }),
       ],
     } as QueryObject;
     return [normalizeOrderBy(queryObjectB)];

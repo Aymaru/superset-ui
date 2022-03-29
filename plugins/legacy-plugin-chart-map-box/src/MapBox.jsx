@@ -21,7 +21,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import MapGL from 'react-map-gl';
-import Immutable from 'immutable';
 import ViewportMercator from 'viewport-mercator-project';
 import ScatterPlotGlowOverlay from './ScatterPlotGlowOverlay';
 import './MapBox.css';
@@ -103,7 +102,8 @@ class MapBox extends React.Component {
       bounds,
     } = this.props;
     const { viewport } = this.state;
-    const isDragging = viewport.isDragging === undefined ? false : viewport.isDragging;
+    const isDragging =
+      viewport.isDragging === undefined ? false : viewport.isDragging;
 
     // Compute the clusters based on the original bounds and current zoom level. Note when zoom/pan
     // to an area outside of the original bounds, no additional queries are made to the backend to
@@ -132,7 +132,7 @@ class MapBox extends React.Component {
         <ScatterPlotGlowOverlay
           {...viewport}
           isDragging={isDragging}
-          locations={Immutable.fromJS(clusters)}
+          locations={clusters}
           dotRadius={pointRadius}
           pointRadiusUnit={pointRadiusUnit}
           rgb={rgb}
@@ -141,9 +141,9 @@ class MapBox extends React.Component {
           renderWhileDragging={renderWhileDragging}
           aggregation={hasCustomMetric ? aggregatorName : null}
           lngLatAccessor={location => {
-            const coordinates = location.get('geometry').get('coordinates');
+            const { coordinates } = location.geometry;
 
-            return [coordinates.get(0), coordinates.get(1)];
+            return [coordinates[0], coordinates[1]];
           }}
         />
       </MapGL>

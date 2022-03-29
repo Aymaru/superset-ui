@@ -21,7 +21,9 @@ import isBoolean from 'lodash/isBoolean';
 
 import { QueryObject } from './types';
 
-export default function normalizeOrderBy(queryObject: QueryObject): QueryObject {
+export default function normalizeOrderBy(
+  queryObject: QueryObject,
+): QueryObject {
   if (Array.isArray(queryObject.orderby) && queryObject.orderby.length > 0) {
     // ensure a valid orderby clause
     const orderbyClause = queryObject.orderby[0];
@@ -38,6 +40,7 @@ export default function normalizeOrderBy(queryObject: QueryObject): QueryObject 
   // ensure that remove invalid orderby clause
   const cloneQueryObject = { ...queryObject };
   delete cloneQueryObject.timeseries_limit_metric;
+  delete cloneQueryObject.legacy_order_by;
   delete cloneQueryObject.order_desc;
   delete cloneQueryObject.orderby;
 
@@ -50,6 +53,19 @@ export default function normalizeOrderBy(queryObject: QueryObject): QueryObject 
     return {
       ...cloneQueryObject,
       orderby: [[queryObject.timeseries_limit_metric, isAsc]],
+    };
+  }
+
+  // todo: Removed `legacy_ordery_by` after refactoring
+  if (
+    queryObject.legacy_order_by !== undefined &&
+    queryObject.legacy_order_by !== null &&
+    !isEmpty(queryObject.legacy_order_by)
+  ) {
+    return {
+      ...cloneQueryObject,
+      // @ts-ignore
+      orderby: [[queryObject.legacy_order_by, isAsc]],
     };
   }
 

@@ -18,11 +18,20 @@
  * under the License.
  */
 import React, { ReactNode, ReactText, ReactElement } from 'react';
-import { QueryFormData, DatasourceType, Metric, JsonValue, Column } from '@superset-ui/core';
-import sharedControls from './shared-controls';
+import {
+  AdhocColumn,
+  Column,
+  DatasourceType,
+  JsonValue,
+  Metric,
+  QueryFormData,
+} from '@superset-ui/core';
+import { sharedControls } from './shared-controls';
 import sharedControlComponents from './shared-controls/components';
 
 export { Metric } from '@superset-ui/core';
+export { ControlFormItemSpec } from './components/ControlForm';
+export { ControlComponentProps } from './shared-controls/components/types';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyDict = Record<string, any>;
@@ -68,7 +77,10 @@ export interface ControlPanelState {
  * The action dispather will call Redux `dispatch` internally and return what's
  * returned from `dispatch`, which by default is the original or another action.
  */
-export interface ActionDispatcher<ARGS extends unknown[], A extends Action = AnyAction> {
+export interface ActionDispatcher<
+  ARGS extends unknown[],
+  A extends Action = AnyAction,
+> {
   (...args: ARGS): A;
 }
 
@@ -87,11 +99,10 @@ export type ExtraControlProps = {
 } & AnyDict;
 
 // Ref:superset-frontend/src/explore/store.js
-export type ControlState<T = ControlType, O extends SelectOption = SelectOption> = ControlConfig<
-  T,
-  O
-> &
-  ExtraControlProps;
+export type ControlState<
+  T = ControlType,
+  O extends SelectOption = SelectOption,
+> = ControlConfig<T, O> & ExtraControlProps;
 
 export interface ControlStateMapping {
   [key: string]: ControlState;
@@ -115,7 +126,6 @@ export type InternalControlType =
   | 'BoundsControl'
   | 'CheckboxControl'
   | 'CollectionControl'
-  | 'ColorMapControl'
   | 'ColorPickerControl'
   | 'ColorSchemeControl'
   | 'DatasourceControl'
@@ -167,7 +177,7 @@ export type TabOverride = 'data' | 'customize' | boolean;
  *    show a warning based on the value of another component. It's also possible to bind
  *    arbitrary data from the redux store to the component this way.
  * - tabOverride: set to 'data' if you want to force a renderTrigger to show up on the `Data`
-     tab, or 'customize' if you want it to show up on that tam. Otherwise sections with ALL 
+     tab, or 'customize' if you want it to show up on that tam. Otherwise sections with ALL
      `renderTrigger: true` components will show up on the `Customize` tab.
  * - visibility: a function that uses control panel props to check whether a control should
  *    be visibile.
@@ -175,7 +185,7 @@ export type TabOverride = 'data' | 'customize' | boolean;
 export interface BaseControlConfig<
   T extends ControlType = ControlType,
   O extends SelectOption = SelectOption,
-  V = JsonValue
+  V = JsonValue,
 > extends AnyDict {
   type: T;
   label?: ReactNode;
@@ -200,7 +210,7 @@ export interface BaseControlConfig<
 export interface ControlValueValidator<
   T = ControlType,
   O extends SelectOption = SelectOption,
-  V = unknown
+  V = unknown,
 > {
   (value: V, state?: ControlState<T, O>): boolean | string;
 }
@@ -228,7 +238,7 @@ interface FilterOption<T extends SelectOption> {
 // Ref: superset-frontend/src/components/Select/SupersetStyledSelect.tsx
 export interface SelectControlConfig<
   O extends SelectOption = SelectOption,
-  T extends SelectControlType = SelectControlType
+  T extends SelectControlType = SelectControlType,
 > extends BaseControlConfig<T, O> {
   clearable?: boolean;
   freeForm?: boolean;
@@ -238,18 +248,24 @@ export interface SelectControlConfig<
   options?: O[];
   optionRenderer?: (option: O) => ReactNode;
   valueRenderer?: (option: O) => ReactNode;
-  filterOption?: ((option: FilterOption<O>, rawInput: string) => Boolean) | null;
+  filterOption?:
+    | ((option: FilterOption<O>, rawInput: string) => Boolean)
+    | null;
 }
 
 export type SharedControlConfig<
   T extends InternalControlType = InternalControlType,
-  O extends SelectOption = SelectOption
-> = T extends SelectControlType ? SelectControlConfig<O, T> : BaseControlConfig<T>;
+  O extends SelectOption = SelectOption,
+> = T extends SelectControlType
+  ? SelectControlConfig<O, T>
+  : BaseControlConfig<T>;
 
 /** --------------------------------------------
  * Custom controls
  * --------------------------------------------- */
-export type CustomControlConfig<P = {}> = BaseControlConfig<React.ComponentType<P>> &
+export type CustomControlConfig<P = {}> = BaseControlConfig<
+  React.ComponentType<P>
+> &
   // two run-time properties from superset-frontend/src/explore/components/Control.jsx
   Omit<P, 'onChange' | 'hovered'>;
 
@@ -259,7 +275,7 @@ export type CustomControlConfig<P = {}> = BaseControlConfig<React.ComponentType<
 //  - otherwise assume it's a custom component control
 export type ControlConfig<
   T = AnyDict,
-  O extends SelectOption = SelectOption
+  O extends SelectOption = SelectOption,
 > = T extends InternalControlType
   ? SharedControlConfig<T, O>
   : T extends object
@@ -277,7 +293,9 @@ export type SharedSectionAlias =
   | 'sqlaTimeSeries'
   | 'NVD3TimeSeries';
 
-export interface OverrideSharedControlItem<A extends SharedControlAlias = SharedControlAlias> {
+export interface OverrideSharedControlItem<
+  A extends SharedControlAlias = SharedControlAlias,
+> {
   name: A;
   override: Partial<SharedControls[A]>;
 }
@@ -292,7 +310,10 @@ export type CustomControlItem = {
 // interfere with other ControlSetItem types
 export type ExpandedControlItem = CustomControlItem | ReactElement | null;
 
-export type ControlSetItem = SharedControlAlias | OverrideSharedControlItem | ExpandedControlItem;
+export type ControlSetItem =
+  | SharedControlAlias
+  | OverrideSharedControlItem
+  | ExpandedControlItem;
 
 export type ControlSetRow = ControlSetItem[];
 
@@ -360,3 +381,23 @@ export type ColorFormatters = {
 }[];
 
 export default {};
+
+export function isColumnMeta(
+  column: AdhocColumn | ColumnMeta,
+): column is ColumnMeta {
+  return 'column_name' in column;
+}
+
+export function isSavedExpression(
+  column: AdhocColumn | ColumnMeta,
+): column is ColumnMeta {
+  return (
+    'column_name' in column && 'expression' in column && !!column.expression
+  );
+}
+
+export function isAdhocColumn(
+  column: AdhocColumn | ColumnMeta,
+): column is AdhocColumn {
+  return 'label' in column && 'sqlExpression' in column;
+}

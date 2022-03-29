@@ -17,17 +17,22 @@
  * under the License.
  */
 import React, { useEffect, useState } from 'react';
-import { JsonObject, seedRandom, SuperChart } from '@superset-ui/core';
-import schemas from '@superset-ui/core/esm/color/colorSchemes/sequential/d3';
-import CountryMapChartPlugin from '@superset-ui/legacy-plugin-chart-country-map/src';
-import countries from '@superset-ui/legacy-plugin-chart-country-map/src/countries';
+import {
+  JsonObject,
+  seedRandom,
+  SuperChart,
+  SequentialD3,
+} from '@superset-ui/core';
+import CountryMapChartPlugin, {
+  countries,
+} from '@superset-ui/legacy-plugin-chart-country-map';
 import { withKnobs, select } from '@storybook/addon-knobs';
 import { withResizableChartDemo } from '../../../shared/components/ResizableChartDemo';
 
 new CountryMapChartPlugin().configure({ key: 'country-map' }).register();
 
 export default {
-  title: 'Legacy Chart Plugins|legacy-plugin-chart-country-map',
+  title: 'Legacy Chart Plugins/legacy-plugin-chart-country-map',
   decorators: [withKnobs, withResizableChartDemo],
 };
 
@@ -40,10 +45,10 @@ function generateData(geojson: JsonObject) {
 
 export const basic = function BasicCountryMapStory({ width, height }) {
   const country = select('Country', Object.keys(countries!), 'france');
-  const colorSchema = select(
+  const colorSchema = select<any>(
     'Color schema',
-    schemas,
-    schemas.find(x => x.id === 'schemeOranges'),
+    SequentialD3,
+    SequentialD3.find(x => x.id === 'schemeOranges'),
   );
   const [data, setData] = useState<JsonObject>();
 
@@ -61,7 +66,11 @@ export const basic = function BasicCountryMapStory({ width, height }) {
   }, [country]);
 
   if (!data) {
-    return <div style={{ color: '#aaa', textAlign: 'center', padding: 20 }}>Loading...</div>;
+    return (
+      <div style={{ color: '#aaa', textAlign: 'center', padding: 20 }}>
+        Loading...
+      </div>
+    );
   }
 
   return (

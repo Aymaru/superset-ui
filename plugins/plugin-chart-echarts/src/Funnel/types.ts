@@ -16,11 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { EChartsOption } from 'echarts';
+import { EChartsCoreOption } from 'echarts';
 import {
   ChartDataResponseResult,
   ChartProps,
   DataRecordValue,
+  QueryFormColumn,
   QueryFormData,
   SetDataMaskHook,
 } from '@superset-ui/core';
@@ -34,7 +35,7 @@ import {
 export type EchartsFunnelFormData = QueryFormData &
   EchartsLegendFormData & {
     colorScheme?: string;
-    groupby: string[];
+    groupby: QueryFormData[];
     labelLine: boolean;
     labelType: EchartsFunnelLabelTypeType;
     metric?: string;
@@ -80,10 +81,10 @@ export interface FunnelChartTransformedProps {
   formData: EchartsFunnelFormData;
   height: number;
   width: number;
-  echartOptions: EChartsOption;
+  echartOptions: EChartsCoreOption;
   emitFilter: boolean;
   setDataMask: SetDataMaskHook;
   labelMap: Record<string, DataRecordValue[]>;
-  groupby: string[];
+  groupby: QueryFormColumn[];
   selectedValues: Record<number, string>;
 }

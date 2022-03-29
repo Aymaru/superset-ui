@@ -20,17 +20,18 @@ import {
   ChartDataResponseResult,
   ChartProps,
   DataRecordValue,
+  QueryFormColumn,
   QueryFormData,
   QueryFormMetric,
   SetDataMaskHook,
 } from '@superset-ui/core';
-import { EChartsOption } from 'echarts';
+import { EChartsCoreOption } from 'echarts';
 import { CallbackDataParams } from 'echarts/types/src/util/types';
 import { LabelPositionEnum } from '../types';
 
 export type EchartsTreemapFormData = QueryFormData & {
   colorScheme?: string;
-  groupby: string[];
+  groupby: QueryFormColumn[];
   metric?: QueryFormMetric;
   labelType: EchartsTreemapLabelType;
   labelPosition: LabelPositionEnum;
@@ -77,10 +78,10 @@ export interface TreemapTransformedProps {
   formData: EchartsTreemapFormData;
   height: number;
   width: number;
-  echartOptions: EChartsOption;
+  echartOptions: EChartsCoreOption;
   emitFilter: boolean;
   setDataMask: SetDataMaskHook;
   labelMap: Record<string, DataRecordValue[]>;
-  groupby: string[];
+  groupby: QueryFormColumn[];
   selectedValues: Record<number, string>;
 }

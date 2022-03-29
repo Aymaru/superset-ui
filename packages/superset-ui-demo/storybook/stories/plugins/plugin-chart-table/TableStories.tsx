@@ -1,13 +1,34 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 import React from 'react';
 import memoizeOne from 'memoize-one';
 import { withKnobs, number, boolean } from '@storybook/addon-knobs';
 import { SuperChart } from '@superset-ui/core';
-import TableChartPlugin, { TableChartProps } from '@superset-ui/plugin-chart-table/src';
+import TableChartPlugin, {
+  TableChartProps,
+} from '@superset-ui/plugin-chart-table';
 import { basicFormData, basicData, birthNames } from './testData';
 import { withResizableChartDemo } from '../../../shared/components/ResizableChartDemo';
 
 export default {
-  title: 'Chart Plugins|plugin-chart-table',
+  title: 'Chart Plugins/plugin-chart-table',
   decorators: [withKnobs, withResizableChartDemo],
 };
 
@@ -106,7 +127,14 @@ export const BigTable = ({ width, height }) => {
     showCellBars,
     includeSearch,
   });
-  return <SuperChart chartType="table" {...chartProps} width={width} height={height} />;
+  return (
+    <SuperChart
+      chartType="table"
+      {...chartProps}
+      width={width}
+      height={height}
+    />
+  );
 };
 BigTable.story = {
   parameters: {

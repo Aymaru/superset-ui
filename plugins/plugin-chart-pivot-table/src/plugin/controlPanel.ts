@@ -16,7 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { QueryFormMetric, smartDateFormatter, t, validateNonEmpty } from '@superset-ui/core';
+import {
+  QueryFormMetric,
+  smartDateFormatter,
+  t,
+  validateNonEmpty,
+} from '@superset-ui/core';
 import {
   ControlPanelConfig,
   D3_TIME_FORMAT_OPTIONS,
@@ -24,6 +29,7 @@ import {
   sections,
   sharedControls,
   emitFilterControl,
+  legacySortBy,
 } from '@superset-ui/chart-controls';
 import { MetricsLayoutEnum } from '../types';
 
@@ -75,7 +81,9 @@ const config: ControlPanelConfig = {
                 [MetricsLayoutEnum.COLUMNS, t('Columns')],
                 [MetricsLayoutEnum.ROWS, t('Rows')],
               ],
-              description: t('Use metrics as a top level group for columns or for rows'),
+              description: t(
+                'Use metrics as a top level group for columns or for rows',
+              ),
             },
           },
         ],
@@ -89,20 +97,7 @@ const config: ControlPanelConfig = {
             },
           },
         ],
-        ['timeseries_limit_metric'],
-        [
-          {
-            name: 'order_desc',
-            config: {
-              type: 'CheckboxControl',
-              label: t('Sort descending'),
-              default: true,
-              description: t(
-                'Whether to sort descending or ascending. Takes effect only when "Sort by" is set',
-              ),
-            },
-          },
-        ],
+        ...legacySortBy,
       ],
     },
     {
@@ -205,7 +200,10 @@ const config: ControlPanelConfig = {
         [
           {
             name: 'valueFormat',
-            config: { ...sharedControls.y_axis_format, label: t('Value format') },
+            config: {
+              ...sharedControls.y_axis_format,
+              label: t('Value format'),
+            },
           },
         ],
         [
@@ -303,7 +301,9 @@ const config: ControlPanelConfig = {
               label: t('Conditional formatting'),
               description: t('Apply conditional color formatting to metrics'),
               mapStateToProps(explore) {
-                const values = (explore?.controls?.metrics?.value as QueryFormMetric[]) ?? [];
+                const values =
+                  (explore?.controls?.metrics?.value as QueryFormMetric[]) ??
+                  [];
                 const verboseMap = explore?.datasource?.verbose_map ?? {};
                 const metricColumn = values.map(value => {
                   if (typeof value === 'string') {

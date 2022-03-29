@@ -28,7 +28,11 @@ import {
 } from '@superset-ui/chart-controls';
 
 import { DEFAULT_FORM_DATA, EchartsTimeseriesContributionType } from '../types';
-import { legendSection, showValueControl } from '../../controls';
+import {
+  legendSection,
+  richTooltipSection,
+  showValueSection,
+} from '../../controls';
 
 const {
   contributionMode,
@@ -37,8 +41,6 @@ const {
   markerSize,
   minorSplitLine,
   rowLimit,
-  stack,
-  tooltipTimeFormat,
   truncateYAxis,
   yAxisBounds,
   zoomable,
@@ -90,24 +92,13 @@ const config: ControlPanelConfig = {
     sections.advancedAnalyticsControls,
     sections.annotationsAndLayersControls,
     sections.forecastIntervalControls,
+    sections.titleControls,
     {
       label: t('Chart Options'),
       expanded: true,
       controlSetRows: [
-        ['color_scheme', 'label_colors'],
-        [showValueControl],
-        [
-          {
-            name: 'stack',
-            config: {
-              type: 'CheckboxControl',
-              label: t('Stack series'),
-              renderTrigger: true,
-              default: stack,
-              description: t('Stack series on top of each other'),
-            },
-          },
-        ],
+        ['color_scheme'],
+        ...showValueSection,
         [
           {
             name: 'markerEnabled',
@@ -116,7 +107,9 @@ const config: ControlPanelConfig = {
               label: t('Marker'),
               renderTrigger: true,
               default: markerEnabled,
-              description: t('Draw a marker on data points. Only applicable for line types.'),
+              description: t(
+                'Draw a marker on data points. Only applicable for line types.',
+              ),
             },
           },
         ],
@@ -128,9 +121,11 @@ const config: ControlPanelConfig = {
               label: t('Marker Size'),
               renderTrigger: true,
               min: 0,
-              max: 100,
+              max: 20,
               default: markerSize,
-              description: t('Size of marker. Also applies to forecast observations.'),
+              description: t(
+                'Size of marker. Also applies to forecast observations.',
+              ),
               visibility: ({ controls }: ControlPanelsContainerProps) =>
                 Boolean(controls?.markerEnabled?.value),
             },
@@ -176,37 +171,17 @@ const config: ControlPanelConfig = {
               ],
               default: xAxisLabelRotation,
               renderTrigger: true,
-              description: t('Input field supports custom rotation. e.g. 30 for 30°'),
+              description: t(
+                'Input field supports custom rotation. e.g. 30 for 30°',
+              ),
             },
           },
         ],
         // eslint-disable-next-line react/jsx-key
-        [<h1 className="section-header">{t('Tooltip')}</h1>],
-        [
-          {
-            name: 'rich_tooltip',
-            config: {
-              type: 'CheckboxControl',
-              label: t('Rich tooltip'),
-              renderTrigger: true,
-              default: true,
-              description: t('Shows a list of all series available at that point in time'),
-            },
-          },
-        ],
-        [
-          {
-            name: 'tooltipTimeFormat',
-            config: {
-              ...sharedControls.x_axis_time_format,
-              label: t('Tooltip time format'),
-              default: tooltipTimeFormat,
-              clearable: false,
-            },
-          },
-        ],
+        ...richTooltipSection,
         // eslint-disable-next-line react/jsx-key
         [<h1 className="section-header">{t('Y Axis')}</h1>],
+
         ['y_axis_format'],
         [
           {
@@ -229,18 +204,6 @@ const config: ControlPanelConfig = {
               renderTrigger: true,
               default: minorSplitLine,
               description: t('Draw split lines for minor y-axis ticks'),
-            },
-          },
-        ],
-        [
-          {
-            name: 'yAxisTitle',
-            config: {
-              type: 'TextControl',
-              label: t('Primary y-axis title'),
-              renderTrigger: true,
-              default: '',
-              description: t('Title for y-axis'),
             },
           },
         ],

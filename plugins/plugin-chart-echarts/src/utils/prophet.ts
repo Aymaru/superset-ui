@@ -19,13 +19,19 @@
 import { TimeseriesDataRecord, NumberFormatter } from '@superset-ui/core';
 import { CallbackDataParams, OptionName } from 'echarts/types/src/util/types';
 import { TooltipMarker } from 'echarts/types/src/util/format';
-import { ForecastSeriesContext, ForecastSeriesEnum, ProphetValue } from '../types';
+import {
+  ForecastSeriesContext,
+  ForecastSeriesEnum,
+  ProphetValue,
+} from '../types';
 import { sanitizeHtml } from './series';
 
 const seriesTypeRegex = new RegExp(
   `(.+)(${ForecastSeriesEnum.ForecastLower}|${ForecastSeriesEnum.ForecastTrend}|${ForecastSeriesEnum.ForecastUpper})$`,
 );
-export const extractForecastSeriesContext = (seriesName: OptionName): ForecastSeriesContext => {
+export const extractForecastSeriesContext = (
+  seriesName: OptionName,
+): ForecastSeriesContext => {
   const name = seriesName as string;
   const regexMatch = seriesTypeRegex.exec(name);
   if (!regexMatch) return { name, type: ForecastSeriesEnum.Observation };
@@ -34,6 +40,16 @@ export const extractForecastSeriesContext = (seriesName: OptionName): ForecastSe
     type: regexMatch[2] as ForecastSeriesEnum,
   };
 };
+
+export const extractForecastSeriesContexts = (
+  seriesNames: string[],
+): { [key: string]: ForecastSeriesEnum[] } =>
+  seriesNames.reduce((agg, name) => {
+    const context = extractForecastSeriesContext(name);
+    const currentContexts = agg[context.name] || [];
+    currentContexts.push(context.type);
+    return { ...agg, [context.name]: currentContexts };
+  }, {} as { [key: string]: ForecastSeriesEnum[] });
 
 export const extractProphetValuesFromTooltipParams = (
   params: (CallbackDataParams & { seriesId: string })[],
@@ -49,7 +65,8 @@ export const extractProphetValuesFromTooltipParams = (
           marker: marker || '',
         };
       const prophetValues = values[context.name];
-      if (context.type === ForecastSeriesEnum.Observation) prophetValues.observation = numericValue;
+      if (context.type === ForecastSeriesEnum.Observation)
+        prophetValues.observation = numericValue;
       if (context.type === ForecastSeriesEnum.ForecastTrend)
         prophetValues.forecastTrend = numericValue;
       if (context.type === ForecastSeriesEnum.ForecastLower)
@@ -83,14 +100,19 @@ export const formatProphetTooltipSeries = ({
   if (forecastTrend) {
     if (isObservation) row += ', ';
     row += `ŷ = ${formatter(forecastTrend)}`;
-    if (forecastLower && forecastUpper)
-      // the lower bound needs to be added to the upper bound
-      row += ` (${formatter(forecastLower)}, ${formatter(forecastLower + forecastUpper)})`;
   }
+  if (forecastLower && forecastUpper)
+    // the lower bound needs to be added to the upper bound
+    row = `${row.trim()} (${formatter(forecastLower)}, ${formatter(
+      forecastLower + forecastUpper,
+    )})`;
   return `${row.trim()}`;
 };
 
-export function rebaseTimeseriesDatum(data: TimeseriesDataRecord[]) {
+export function rebaseTimeseriesDatum(
+  data: TimeseriesDataRecord[],
+  verboseMap: Record<string, string> = {},
+) {
   const keys = data.length > 0 ? Object.keys(data[0]) : [];
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
@@ -108,7 +130,9 @@ export function rebaseTimeseriesDatum(data: TimeseriesDataRecord[]) {
       ) {
         value -= row[lowerKey] as number;
       }
-      newRow[key] = value;
+      const newKey =
+        key !== '__timestamp' && verboseMap[key] ? verboseMap[key] : key;
+      newRow[newKey] = value;
     });
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return newRow;

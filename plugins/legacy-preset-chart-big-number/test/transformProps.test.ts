@@ -31,7 +31,7 @@ const formData = {
     a: 1,
   },
   compareLag: 1,
-  timeGrainSqla: 'P0.25Y' as TimeGranularity,
+  timeGrainSqla: 'P3M' as TimeGranularity,
   compareSuffix: 'over last quarter',
   vizType: 'big_number',
   yAxisFormat: '.3s',
@@ -46,7 +46,7 @@ const rawFormData = {
     a: 1,
   },
   compare_lag: 1,
-  time_grain_sqla: 'P0.25Y' as TimeGranularity,
+  time_grain_sqla: 'P3M' as TimeGranularity,
   compare_suffix: 'over last quarter',
   viz_type: 'big_number',
   y_axis_format: '.3s',
@@ -117,7 +117,9 @@ describe('BigNumber', () => {
       expect(transformed.bigNumberFallback).not.toBeNull();
 
       // should successfully formatTime by ganularity
-      expect(transformed.formatTime(new Date('2020-01-01'))).toStrictEqual('2020-01-01 00:00:00');
+      expect(transformed.formatTime(new Date('2020-01-01'))).toStrictEqual(
+        '2020-01-01 00:00:00',
+      );
     });
 
     it('should respect datasource d3 format', () => {
@@ -135,7 +137,9 @@ describe('BigNumber', () => {
         },
       };
       const transformed = transformProps(propsWithDatasource);
-      expect(transformed.formatNumber(transformed.bigNumber)).toStrictEqual('1.23');
+      expect(transformed.headerFormatter(transformed.bigNumber)).toStrictEqual(
+        '1.23',
+      );
     });
   });
 });

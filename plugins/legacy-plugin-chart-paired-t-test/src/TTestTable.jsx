@@ -133,10 +133,15 @@ class TTestTable extends React.Component {
       }
     });
     const tvalue = -Math.abs(
-      diffSum * Math.sqrt((finiteCount - 1) / (finiteCount * diffSqSum - diffSum * diffSum)),
+      diffSum *
+        Math.sqrt(
+          (finiteCount - 1) / (finiteCount * diffSqSum - diffSum * diffSum),
+        ),
     );
     try {
-      return (2 * new dist.Studentt(finiteCount - 1).cdf(tvalue)).toFixed(pValPrec); // two-sided test
+      return (2 * new dist.Studentt(finiteCount - 1).cdf(tvalue)).toFixed(
+        pValPrec,
+      ); // two-sided test
     } catch (error) {
       return NaN;
     }
@@ -195,10 +200,12 @@ class TTestTable extends React.Component {
       </Th>,
     );
     const rows = data.map((entry, i) => {
-      const values = groups.map((
-        group,
-        j, // group names
-      ) => <Td key={j} column={group} data={entry.group[j]} />);
+      const values = groups.map(
+        (
+          group,
+          j, // group names
+        ) => <Td key={j} column={group} data={entry.group[j]} />,
+      );
       values.push(
         <Td
           key={numGroups + 1}
