@@ -1,6 +1,6 @@
 {
-  "name": "@superset-ui/plugin-chart-echarts-sn",
-  "version": "1.0.1",
+  "name": "@smartnow/plugin-chart-echarts-sn",
+  "version": "1.0.2",
   "description": "Superset Chart - Echarts",
   "sideEffects": false,
   "main": "lib/index.js",
@@ -35,5 +35,13 @@
   },
   "peerDependencies": {
     "react": "^16.13.1"
+  },
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
   }
 }
